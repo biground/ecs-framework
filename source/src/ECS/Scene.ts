@@ -1,7 +1,7 @@
 ///<reference path="../Math/Vector2.ts" />
 module es {
     /** 场景 */
-    export class Scene {
+    export abstract class Scene extends fairygui.GComponent {
         /** 这个场景中的实体列表 */
         public readonly entities: EntityList;
         /** 管理所有实体处理器 */
@@ -12,12 +12,15 @@ module es {
         private _didSceneBegin: boolean;
 
         constructor() {
+            super();
             this.entities = new EntityList(this);
 
             this.entityProcessors = new EntityProcessorList();
             this.identifierPool = new IdentifierPool();
+        }
 
-            this.initialize();
+        onConstruct() {
+            this.initialize?.();
         }
 
         /**
@@ -26,8 +29,7 @@ module es {
          * 这个方法会在场景创建时被调用。您可以在这个方法中添加实体和组件，
          * 或者执行一些必要的准备工作，以便场景能够开始运行。
          */
-        public initialize() {
-        }
+        public initialize() { }
 
         /**
          * 开始运行场景时调用此方法，可以在派生类中覆盖
@@ -35,8 +37,7 @@ module es {
          * 这个方法会在场景开始运行时被调用。您可以在这个方法中执行场景开始时需要进行的操作。
          * 比如，您可以开始播放一段背景音乐、启动UI等等。
          */
-        public onStart() {
-        }
+        public onStart() { }
 
         /**
          * 卸载场景时调用此方法，可以在派生类中覆盖
@@ -44,8 +45,7 @@ module es {
          * 这个方法会在场景被销毁时被调用。您可以在这个方法中销毁实体和组件、释放资源等等。
          * 您也可以在这个方法中执行一些必要的清理工作，以确保场景被完全卸载。
          */
-        public unload() {
-        }
+        public onUnload() { }
 
         /**
          * 开始场景，初始化物理系统、启动实体处理器等
@@ -90,7 +90,7 @@ module es {
                 this.entityProcessors.end();
 
             // 调用卸载方法
-            this.unload();
+            this.onUnload();
         }
 
         /**

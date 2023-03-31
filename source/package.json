@@ -20,14 +20,14 @@
     "gulp-babel": "^8.0.0",
     "gulp-concat": "^2.6.1",
     "gulp-inject-string": "^1.1.2",
-    "gulp-minify": "^3.1.0",
+    "gulp-minify": "^3.0.0",
     "gulp-string-replace": "^1.1.2",
-    "gulp-typescript": "^5.0.1",
+    "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-uglify": "^3.0.2",
     "merge2": "^1.4.1",
     "tsify": "^3.0.1",
     "typedoc": "^0.23.26",
-    "typescript": "^2.2.2",
+    "typescript": "^5.0.2",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^4.0.0"
   },
@@ -37,6 +37,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/esengine/ecs-framework.git"
-  },
-  "dependencies": {}
+  }
 }

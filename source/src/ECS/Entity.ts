@@ -26,6 +26,10 @@ module es {
          * 封装实体的位置/旋转/缩放，并允许设置一个高层结构
          */
         public readonly transform: Transform;
+        /** 
+         * 实体的渲染对象
+         * */
+        public readonly stageObj: Laya.Sprite;
         /**
          * 当前附加到此实体的所有组件的列表
          */

@@ -4,23 +4,21 @@
     "importHelpers": true,
     "pretty": true,
     "preserveConstEnums": true,
-    "alwaysStrict": true,
     "module": "system",
-    "target": "es5",
+    "target": "es6",
     "declaration": true,
     "sourceMap": false,
     "removeComments": false,
     "outFile": "./framework.js",
+    "skipLibCheck": true,
     "lib": [
-      "es5",
       "dom",
-      "es2015.promise",
       "es6"
     ]
   },
   "include": [
     "src",
-    "lib"
+    "libs"
   ],
   "exclude": [
     "node_modules"

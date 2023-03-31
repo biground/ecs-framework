@@ -10,9 +10,6 @@ const tsProject = ts.createProject('tsconfig.json');
 function buildJs() {
   return tsProject.src()
     .pipe(tsProject())
-    .js.pipe(inject.replace('var es;', ''))
-    .pipe(inject.prepend('window.es = {};\n'))
-    .pipe(inject.replace('var __extends =', 'window.__extends ='))
     .pipe(minify({ ext: { min: ".min.js" } }))
     .pipe(gulp.dest('./bin'));
 }

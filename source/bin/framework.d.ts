@@ -42,7 +42,7 @@ declare module es {
          * 提供对单例/游戏实例的访问
          * @constructor
          */
-        static readonly Instance: Core;
+        static get Instance(): Core;
         _frameCounterElapsedTime: number;
         _frameCounter: number;
         _totalMemory: number;
@@ -51,11 +51,12 @@ declare module es {
         /**
          * 当前活动的场景。注意，如果设置了该设置，在更新结束之前场景实际上不会改变
          */
+        static get scene(): Scene;
         /**
-        * 当前活动的场景。注意，如果设置了该设置，在更新结束之前场景实际上不会改变
-        * @param value
-        */
-        static scene: Scene;
+         * 当前活动的场景。注意，如果设置了该设置，在更新结束之前场景实际上不会改变
+         * @param value
+         */
+        static set scene(value: Scene);
         /**
          * `Core`类的静态方法，用于创建`Core`的实例。
          * @param debug {boolean} 是否为调试模式，默认为`true`
@@ -204,20 +205,22 @@ declare module es {
         /**
          * 快速访问 this.entity.transform
          */
-        readonly transform: Transform;
+        get transform(): Transform;
         private _enabled;
         /**
          * 如果组件和实体都已启用，则为。当启用该组件时，将调用该组件的生命周期方法。状态的改变会导致调用onEnabled/onDisable。
          */
+        get enabled(): boolean;
         /**
-        * 如果组件和实体都已启用，则为。当启用该组件时，将调用该组件的生命周期方法。状态的改变会导致调用onEnabled/onDisable。
-        * @param value
-        */
-        enabled: boolean;
+         * 如果组件和实体都已启用，则为。当启用该组件时，将调用该组件的生命周期方法。状态的改变会导致调用onEnabled/onDisable。
+         * @param value
+         */
+        set enabled(value: boolean);
         private _updateOrder;
         /** 更新此实体上组件的顺序 */
+        get updateOrder(): number;
         /** 更新此实体上组件的顺序 */
-        updateOrder: number;
+        set updateOrder(value: number);
         /**
          * 当此组件已分配其实体，但尚未添加到实体的活动组件列表时调用。有用的东西，如物理组件，需要访问转换来修改碰撞体的属性。
          */
@@ -327,6 +330,10 @@ declare module es {
          */
         readonly transform: Transform;
         /**
+         * 实体的渲染对象
+         * */
+        readonly stageObj: Laya.Sprite;
+        /**
          * 当前附加到此实体的所有组件的列表
          */
         readonly components: ComponentList;
@@ -340,47 +347,59 @@ declare module es {
         /**
          * 如果调用了destroy，那么在下一次处理实体之前这将一直为true
          */
-        readonly isDestroyed: boolean;
+        get isDestroyed(): boolean;
         private _tag;
         /**
          * 你可以随意使用。稍后可以使用它来查询场景中具有特定标记的所有实体
          */
+        get tag(): number;
         /**
-        * 你可以随意使用。稍后可以使用它来查询场景中具有特定标记的所有实体
-        * @param value
-        */
-        tag: number;
+         * 你可以随意使用。稍后可以使用它来查询场景中具有特定标记的所有实体
+         * @param value
+         */
+        set tag(value: number);
         private _enabled;
         /**
          * 启用/禁用实体。当禁用碰撞器从物理系统和组件中移除时，方法将不会被调用
          */
+        get enabled(): boolean;
         /**
-        * 启用/禁用实体。当禁用碰撞器从物理系统和组件中移除时，方法将不会被调用
-        * @param value
-        */
-        enabled: boolean;
+         * 启用/禁用实体。当禁用碰撞器从物理系统和组件中移除时，方法将不会被调用
+         * @param value
+         */
+        set enabled(value: boolean);
         private _updateOrder;
         /**
          * 更新此实体的顺序。updateOrder还用于对scene.entities上的标签列表进行排序
          */
+        get updateOrder(): number;
         /**
-        * 更新此实体的顺序。updateOrder还用于对scene.entities上的标签列表进行排序
-        * @param value
-        */
-        updateOrder: number;
-        parent: Transform;
-        readonly childCount: number;
-        position: Vector2;
-        localPosition: Vector2;
-        rotation: number;
-        rotationDegrees: number;
-        localRotation: number;
-        localRotationDegrees: number;
-        scale: Vector2;
-        localScale: Vector2;
-        readonly worldInverseTransform: Matrix2D;
-        readonly localToWorldTransform: Matrix2D;
-        readonly worldToLocalTransform: Matrix2D;
+         * 更新此实体的顺序。updateOrder还用于对scene.entities上的标签列表进行排序
+         * @param value
+         */
+        set updateOrder(value: number);
+        get parent(): Transform;
+        set parent(value: Transform);
+        get childCount(): number;
+        get position(): Vector2;
+        set position(value: Vector2);
+        get localPosition(): Vector2;
+        set localPosition(value: Vector2);
+        get rotation(): number;
+        set rotation(value: number);
+        get rotationDegrees(): number;
+        set rotationDegrees(value: number);
+        get localRotation(): number;
+        set localRotation(value: number);
+        get localRotationDegrees(): number;
+        set localRotationDegrees(value: number);
+        get scale(): Vector2;
+        set scale(value: Vector2);
+        get localScale(): Vector2;
+        set localScale(value: Vector2);
+        get worldInverseTransform(): Matrix2D;
+        get localToWorldTransform(): Matrix2D;
+        get worldToLocalTransform(): Matrix2D;
         onTransformChanged(comp: ComponentTransform): void;
         setParent(parent: Entity): any;
         setParent(parent: Transform): any;
@@ -516,14 +535,14 @@ declare module es {
          * @param y 二维空间的y坐标
          */
         constructor(x?: number, y?: number);
-        static readonly zero: Vector2;
-        static readonly one: Vector2;
-        static readonly unitX: Vector2;
-        static readonly unitY: Vector2;
-        static readonly up: Vector2;
-        static readonly down: Vector2;
-        static readonly left: Vector2;
-        static readonly right: Vector2;
+        static get zero(): Vector2;
+        static get one(): Vector2;
+        static get unitX(): Vector2;
+        static get unitY(): Vector2;
+        static get up(): Vector2;
+        static get down(): Vector2;
+        static get left(): Vector2;
+        static get right(): Vector2;
         /**
          *
          * @param value1
@@ -732,7 +751,7 @@ declare module es {
 }
 declare module es {
     /** 场景 */
-    class Scene {
+    abstract class Scene extends fairygui.GComponent {
         /** 这个场景中的实体列表 */
         readonly entities: EntityList;
         /** 管理所有实体处理器 */
@@ -741,6 +760,7 @@ declare module es {
         readonly identifierPool: IdentifierPool;
         private _didSceneBegin;
         constructor();
+        onConstruct(): void;
         /**
          * 初始化场景，可以在派生类中覆盖
          *
@@ -761,7 +781,7 @@ declare module es {
          * 这个方法会在场景被销毁时被调用。您可以在这个方法中销毁实体和组件、释放资源等等。
          * 您也可以在这个方法中执行一些必要的清理工作，以确保场景被完全卸载。
          */
-        unload(): void;
+        onUnload(): void;
         /**
          * 开始场景，初始化物理系统、启动实体处理器等
          *
@@ -883,14 +903,14 @@ declare module es {
          */
         _loadsNewScene: boolean;
         private _hasPreviousSceneRender;
-        readonly hasPreviousSceneRender: boolean;
+        get hasPreviousSceneRender(): boolean;
         /**
          * 将此用于两部分过渡。例如，褪色会先褪色为黑色，然后当_isNewSceneLoaded变为true时会褪色。
          * 对于场景内转换，应在中点将isNewSceneLoaded设置为true，就像加载了新场景一样
          */
         _isNewSceneLoaded: boolean;
         protected constructor(sceneLoadAction: () => Scene);
-        protected LoadNextScene(): IterableIterator<string>;
+        protected LoadNextScene(): Generator<string, void, unknown>;
         /**
          * 在前一个场景出现第一次（也是唯一一次）后调用。
          * 此时，可以在生成一帧后加载新场景（因此第一次渲染调用发生在场景加载之前）
@@ -949,91 +969,100 @@ declare module es {
         /**
          * 这个转换的所有子元素
          */
-        readonly childCount: number;
+        get childCount(): number;
         /**
          * 变换在世界空间的旋转度
          */
+        get rotationDegrees(): number;
         /**
-        * 变换在世界空间的旋转度
-        * @param value
-        */
-        rotationDegrees: number;
+         * 变换在世界空间的旋转度
+         * @param value
+         */
+        set rotationDegrees(value: number);
         /**
          * 旋转相对于父变换旋转的角度
          */
+        get localRotationDegrees(): number;
         /**
-        * 旋转相对于父变换旋转的角度
-        * @param value
-        */
-        localRotationDegrees: number;
-        readonly localToWorldTransform: Matrix2D;
+         * 旋转相对于父变换旋转的角度
+         * @param value
+         */
+        set localRotationDegrees(value: number);
+        get localToWorldTransform(): Matrix2D;
         _parent: Transform;
         /**
          * 获取此转换的父转换
          */
+        get parent(): Transform;
         /**
-        * 设置此转换的父转换
-        * @param value
-        */
-        parent: Transform;
+         * 设置此转换的父转换
+         * @param value
+         */
+        set parent(value: Transform);
         _worldToLocalTransform: Matrix2D;
-        readonly worldToLocalTransform: Matrix2D;
+        get worldToLocalTransform(): Matrix2D;
         _worldInverseTransform: Matrix2D;
-        readonly worldInverseTransform: Matrix2D;
+        get worldInverseTransform(): Matrix2D;
         _position: Vector2;
         /**
          * 变换在世界空间中的位置
          */
+        get position(): Vector2;
         /**
-        * 变换在世界空间中的位置
-        * @param value
-        */
-        position: Vector2;
+         * 变换在世界空间中的位置
+         * @param value
+         */
+        set position(value: Vector2);
         _scale: Vector2;
         /**
          * 变换在世界空间的缩放
          */
+        get scale(): Vector2;
         /**
-        * 变换在世界空间的缩放
-        * @param value
-        */
-        scale: Vector2;
+         * 变换在世界空间的缩放
+         * @param value
+         */
+        set scale(value: Vector2);
         _rotation: number;
         /**
          * 在世界空间中以弧度旋转的变换
          */
+        get rotation(): number;
         /**
-        * 变换在世界空间的旋转度
-        * @param value
-        */
-        rotation: number;
+         * 变换在世界空间的旋转度
+         * @param value
+         */
+        set rotation(value: number);
         _localPosition: Vector2;
         /**
          * 转换相对于父转换的位置。如果转换没有父元素，则与transform.position相同
          */
+        get localPosition(): Vector2;
         /**
-        * 转换相对于父转换的位置。如果转换没有父元素，则与transform.position相同
-        * @param value
-        */
-        localPosition: Vector2;
+         * 转换相对于父转换的位置。如果转换没有父元素，则与transform.position相同
+         * @param value
+         */
+        set localPosition(value: Vector2);
         _localScale: Vector2;
         /**
          * 转换相对于父元素的比例。如果转换没有父元素，则与transform.scale相同
          */
+        get localScale(): Vector2;
         /**
-        * 转换相对于父元素的比例。如果转换没有父元素，则与transform.scale相同
-        * @param value
-        */
-        localScale: Vector2;
+         * 转换相对于父元素的比例。如果转换没有父元素，则与transform.scale相同
+         * @param value
+         */
+        set localScale(value: Vector2);
         _localRotation: number;
         /**
          * 相对于父变换的旋转，变换的旋转。如果转换没有父元素，则与transform.rotation相同
          */
+        get localRotation(): number;
         /**
-        * 相对于父变换的旋转，变换的旋转。如果转换没有父元素，则与transform.rotation相同
-        * @param value
-        */
-        localRotation: number;
+         * 相对于父变换的旋转，变换的旋转。如果转换没有父元素，则与transform.rotation相同
+         * @param value
+         */
+        set localRotation(value: number);
         /**
          * 返回在索引处的转换子元素
          * @param index
@@ -1130,11 +1159,12 @@ declare module es {
         /**
          * 如果启用了SceneComponent，则为true。状态的改变会导致调用onEnabled/onDisable。
          */
+        get enabled(): boolean;
         /**
-        * 如果启用了SceneComponent，则为true。状态的改变会导致调用onEnabled/onDisable。
-        * @param value
-        */
-        enabled: boolean;
+         * 如果启用了SceneComponent，则为true。状态的改变会导致调用onEnabled/onDisable。
+         * @param value
+         */
+        set enabled(value: boolean);
         /**
          * 更新此场景中SceneComponents的顺序
          */
@@ -1176,20 +1206,23 @@ declare module es {
      */
     class ArcadeRigidbody extends Component implements IUpdatable {
         /** 这个刚体的质量。质量为0，则是一个不可移动的物体 */
-        mass: number;
+        get mass(): number;
+        set mass(value: number);
         /**
          * 0-1范围，其中0为无反弹，1为完全反射。
          */
-        readonly elasticity: number;
-        elasticiy: number;
+        get elasticity(): number;
+        set elasticiy(value: number);
         /**
          * 0 - 1范围。0表示没有摩擦力，1表示物体会停止在原地
          */
-        friction: number;
+        get friction(): number;
+        set friction(value: number);
         /**
          * 0-9的范围。当发生碰撞时，沿碰撞面做直线运动时，如果其平方幅度小于glue摩擦力，则将碰撞设置为上限
          */
-        glue: number;
+        get glue(): number;
+        set glue(value: number);
         /**
          *  如果为真，则每一帧都会考虑到Physics.gravity
          */
@@ -1201,7 +1234,7 @@ declare module es {
         /**
          * 质量为0的刚体被认为是不可移动的。改变速度和碰撞对它们没有影响
          */
-        readonly isImmovable: boolean;
+        get isImmovable(): boolean;
         _mass: number;
         _elasticity: number;
         _friction: number;
@@ -1272,7 +1305,7 @@ declare module es {
         reset(): void;
         toString(): string;
     }
-    class CharacterController implements ITriggerListener {
+    export class CharacterController implements ITriggerListener {
         onControllerCollidedEvent: ObservableT<RaycastHit>;
         onTriggerEnterEvent: ObservableT<Collider>;
         onTriggerExitEvent: ObservableT<Collider>;
@@ -1286,7 +1319,8 @@ declare module es {
          * 定义距离碰撞射线的边缘有多远。
          * 如果使用 0 范围进行投射，则通常会导致不需要的光线击中（例如，直接从表面水平投射的足部碰撞器可能会导致击中）
          */
-        skinWidth: number;
+        get skinWidth(): number;
+        set skinWidth(value: number);
         /**
          * CC2D 可以爬升的最大坡度角
          */
@@ -1303,8 +1337,8 @@ declare module es {
         totalVerticalRays: number;
         collisionState: CharacterCollisionState2D;
         velocity: Vector2;
-        readonly isGrounded: boolean;
-        readonly raycastHitsThisFrame: RaycastHit[];
+        get isGrounded(): boolean;
+        get raycastHitsThisFrame(): RaycastHit[];
         constructor(player: Entity, skinWidth?: number, platformMask?: number, onewayPlatformMask?: number, triggerMask?: number);
         onTriggerEnter(other: Collider, local: Collider): void;
         onTriggerExit(other: Collider, local: Collider): void;
@@ -1389,6 +1423,7 @@ declare module es {
         private oneWayPlatformMask;
         private readonly rayOriginSkinMutiplier;
     }
+    export {};
 }
 declare module es {
     /**
@@ -1465,7 +1500,7 @@ declare module es {
 }
 declare module es {
     class Collider extends Component {
-        static readonly lateSortOrder: number;
+        static readonly lateSortOrder = 999;
         castSortOrder: number;
         /**
          * 对撞机的基本形状
@@ -1507,23 +1542,24 @@ declare module es {
         /**
          * 表示碰撞器的绝对位置
          */
-        readonly absolutePosition: Vector2;
+        get absolutePosition(): Vector2;
         /**
          * 封装变换。如果碰撞器没和实体一起旋转 则返回transform.rotation
          */
-        readonly rotation: number;
-        readonly bounds: Rectangle;
+        get rotation(): number;
+        get bounds(): Rectangle;
         protected _localOffset: Vector2;
         /**
          * 将localOffset添加到实体。获取碰撞器几何图形的最终位置。
          * 允许向一个实体添加多个碰撞器并分别定位，还允许你设置缩放/旋转
          */
+        get localOffset(): Vector2;
         /**
-        * 将localOffset添加到实体。获取碰撞器几何图形的最终位置。
-        * 允许向一个实体添加多个碰撞器并分别定位，还允许你设置缩放/旋转
-        * @param value
-        */
-        localOffset: Vector2;
+         * 将localOffset添加到实体。获取碰撞器几何图形的最终位置。
+         * 允许向一个实体添加多个碰撞器并分别定位，还允许你设置缩放/旋转
+         * @param value
+         */
+        set localOffset(value: Vector2);
         /**
          * 将localOffset添加到实体。获取碰撞器的最终位置。
          * 这允许您向一个实体添加多个碰撞器并分别定位它们。
@@ -1590,8 +1626,10 @@ declare module es {
          * @param height
          */
         constructor(x?: number, y?: number, width?: number, height?: number);
-        width: number;
-        height: number;
+        get width(): number;
+        set width(value: number);
+        get height(): number;
+        set height(value: number);
         /**
          * 设置BoxCollider的大小
          * @param width
@@ -1621,7 +1659,8 @@ declare module es {
          * @param radius
          */
         constructor(radius?: number);
-        radius: number;
+        get radius(): number;
+        set radius(value: number);
         /**
          * 设置圆的半径
          * @param radius
@@ -1662,7 +1701,7 @@ declare module es {
         size(): number;
         values(): V[];
     }
-    class HashMap<K, V> implements Map<K, V> {
+    export class HashMap<K, V> implements Map<K, V> {
         private map_;
         private keys_;
         constructor();
@@ -1681,6 +1720,7 @@ declare module es {
         remove(key: any): V;
         size(): number;
     }
+    export {};
 }
 declare module es {
     /**
@@ -1693,19 +1733,21 @@ declare module es {
         private _endTime;
         private _useTime;
         /** 获取系统在当前帧所消耗的时间 仅在debug模式下生效 */
-        readonly useTime: number;
+        get useTime(): number;
         /**
          * 获取系统的更新时序
          */
-        updateOrder: number;
+        get updateOrder(): number;
+        set updateOrder(value: number);
         constructor(matcher?: Matcher);
         private _scene;
         /**
          * 这个系统所属的场景
          */
-        scene: Scene;
+        get scene(): Scene;
+        set scene(value: Scene);
         private _matcher;
-        readonly matcher: Matcher;
+        get matcher(): Matcher;
         /**
          * 设置更新时序
          * @param order 更新时序
@@ -2006,8 +2048,8 @@ declare module es {
          */
         private componentsToAddByType;
         constructor(entity: Entity);
-        readonly count: number;
-        readonly buffer: Component[];
+        get count(): number;
+        get buffer(): Component[];
         markEntityListUnsorted(): void;
         /**
          * 将组件添加到实体的组件列表中，并添加到组件类型字典中。
@@ -2172,8 +2214,8 @@ declare module es {
          */
         _unsortedTags: Set<number>;
         constructor(scene: Scene);
-        readonly count: number;
-        readonly buffer: Entity[];
+        get count(): number;
+        get buffer(): Entity[];
         markEntityListUnsorted(): void;
         markTagUnsorted(tag: number): void;
         /**
@@ -2228,6 +2270,11 @@ declare module es {
          */
         findEntity(name: string): Entity;
         /**
+         * 返回最后一个找到的名字为name的实体。如果没有找到则返回null
+         * @param name
+         */
+        findEntityRight(name: string): Entity;
+        /**
          * 通过实体ID在场景中查找对应实体
          * @param id 实体ID
          * @returns 返回找到的实体，如果没有找到则返回 null
@@ -2270,9 +2317,9 @@ declare module es {
         private _processors;
         private _orderDirty;
         /** 获取处理器列表 */
-        readonly processors: EntitySystem[];
+        get processors(): EntitySystem[];
         /** 获取处理器数量 */
-        readonly count: number;
+        get count(): number;
         /**
          * 添加处理器
          * @param processor 要添加的处理器
@@ -2338,7 +2385,7 @@ declare module es {
         static readonly hashCollisionThreshold: number;
         static readonly hashPrime: number;
         static readonly primes: number[];
-        static readonly maxPrimeArrayLength: number;
+        static readonly maxPrimeArrayLength = 2146435069;
         /**
          * 判断一个数是否为质数
          * @param candidate 要判断的数
@@ -2779,8 +2826,8 @@ declare module es {
 declare module es {
     class MathHelper {
         static readonly Epsilon: number;
-        static readonly Rad2Deg: number;
-        static readonly Deg2Rad: number;
+        static readonly Rad2Deg = 57.29578;
+        static readonly Deg2Rad = 0.0174532924;
         /**
          * 表示pi除以2的值(1.57079637)
          */
@@ -3217,7 +3264,7 @@ declare module es {
      */
     class Matrix {
         private static identity;
-        static readonly Identity: Matrix;
+        static get Identity(): Matrix;
         m11: number;
         m12: number;
         m13: number;
@@ -3269,25 +3316,29 @@ declare module es {
         /**
          * 返回标识矩阵
          */
-        static readonly identity: Matrix2D;
+        static get identity(): Matrix2D;
         setIdentity(): Matrix2D;
         setValues(m11: number, m12: number, m21: number, m22: number, m31: number, m32: number): Matrix2D;
         /**
          * 储存在该矩阵中的位置
          */
-        translation: Vector2;
+        get translation(): Vector2;
+        set translation(value: Vector2);
         /**
          * 以弧度为单位的旋转，存储在这个矩阵中
          */
-        rotation: number;
+        get rotation(): number;
+        set rotation(value: number);
         /**
          * 矩阵中存储的旋转度数
          */
-        rotationDegrees: number;
+        get rotationDegrees(): number;
+        set rotationDegrees(value: number);
         /**
          * 储存在这个矩阵中的缩放
          */
-        scale: Vector2;
+        get scale(): Vector2;
+        set scale(value: Vector2);
         /**
          * 创建一个新的围绕Z轴的旋转矩阵2D
          * @param radians
@@ -3394,46 +3445,48 @@ declare module es {
         /**
          * 返回X=0, Y=0, Width=0, Height=0的矩形
          */
-        static readonly empty: Rectangle;
+        static get empty(): Rectangle;
         /**
          * 返回一个Number.Min/Max值的矩形
          */
-        static readonly maxRect: Rectangle;
+        static get maxRect(): Rectangle;
         /**
          * 返回此矩形左边缘的X坐标
          */
-        readonly left: number;
+        get left(): number;
         /**
          * 返回此矩形右边缘的X坐标
          */
-        readonly right: number;
+        get right(): number;
         /**
          * 返回此矩形顶边的y坐标
          */
-        readonly top: number;
+        get top(): number;
         /**
          * 返回此矩形底边的y坐标
          */
-        readonly bottom: number;
+        get bottom(): number;
         /**
          * 获取矩形的最大点，即右下角
          */
-        readonly max: Vector2;
+        get max(): Vector2;
         /**
          * 这个矩形的宽和高是否为0，位置是否为（0，0）
          */
         isEmpty(): boolean;
         /** 这个矩形的左上角坐标 */
-        location: Vector2;
+        get location(): Vector2;
+        set location(value: Vector2);
         /**
          * 这个矩形的宽-高坐标
          */
-        size: Vector2;
+        get size(): Vector2;
+        set size(value: Vector2);
         /**
          * 位于这个矩形中心的一个点
          * 如果 "宽度 "或 "高度 "是奇数，则中心点将向下舍入
          */
-        readonly center: Vector2;
+        get center(): Vector2;
         _tempMat: Matrix2D;
         _transformMat: Matrix2D;
         /**
@@ -3836,9 +3889,9 @@ declare module es {
      * 不是真正的射线(射线只有开始和方向)，作为一条线和射线。
      */
     class Ray2D {
-        readonly start: Vector2;
-        readonly direction: Vector2;
-        readonly end: Vector2;
+        get start(): Vector2;
+        get direction(): Vector2;
+        get end(): Vector2;
         constructor(pos: Vector2, end: Vector2);
         private _start;
         private _direction;
@@ -4079,7 +4132,7 @@ declare module es {
          * 边缘法线用于SAT碰撞检测。缓存它们用于避免squareRoots
          * box只有两个边缘 因为其他两边是平行的
          */
-        readonly edgeNormals: Vector2[];
+        get edgeNormals(): Vector2[];
         /**
          * 重置点并重新计算中心和边缘法线
          * @param points
@@ -4139,7 +4192,7 @@ declare module es {
          */
         static rotatePolygonVerts(radians: number, originalPoints: Vector2[], rotatedPoints: Vector2[]): void;
         recalculateBounds(collider: Collider): void;
-        overlaps(other: Shape): any;
+        overlaps(other: Shape): boolean;
         collidesWithShape(other: Shape, result: Out<CollisionResult>): boolean;
         collidesWithLine(start: Vector2, end: Vector2, hit: Out<RaycastHit>): boolean;
         /**
@@ -4172,7 +4225,7 @@ declare module es {
          */
         updateBox(width: number, height: number): void;
         getEdges(): Array<Line>;
-        overlaps(other: Shape): any;
+        overlaps(other: Shape): boolean;
         collidesWithShape(other: Shape, result: Out<CollisionResult>): boolean;
         containsPoint(point: Vector2): boolean;
         pointCollidesWithShape(point: Vector2, result: Out<CollisionResult>): boolean;
@@ -4185,7 +4238,7 @@ declare module es {
         _originalRadius: number;
         constructor(radius: number);
         recalculateBounds(collider: Collider): void;
-        overlaps(other: Shape): any;
+        overlaps(other: Shape): boolean;
         collidesWithShape(other: Shape, result: Out<CollisionResult>): boolean;
         collidesWithLine(start: Vector2, end: Vector2, hit: Out<RaycastHit>): boolean;
         getPointAlongEdge(angle: number): Vector2;
@@ -4231,7 +4284,7 @@ declare module es {
         start: Vector2;
         end: Vector2;
         constructor(start: Vector2, end: Vector2);
-        readonly direction: Vector2;
+        get direction(): Vector2;
         getNormal(): Vector2;
         getDirection(out: Vector2): Vector2;
         getLength(): number;
@@ -4296,7 +4349,7 @@ declare module es {
         numberOfPoints: number;
         angleStep: number;
         points: Vector2[];
-        readonly sectorAngle: number;
+        get sectorAngle(): number;
         constructor(center: Vector2, radius: number, startAngle: number, endAngle: number);
         /**
          * 获取圆弧的质心。
@@ -4410,7 +4463,7 @@ declare module es {
     * 以便在必要时可以重新添加自己。
     */
     abstract class AbstractTweenable implements ITweenable {
-        readonly discriminator: string;
+        readonly discriminator = "ITweenable";
         protected _isPaused: boolean;
         /**
          * abstractTweenable在完成后往往会被保留下来。
@@ -4451,7 +4504,7 @@ declare module es {
 }
 declare module es {
     class TransformSpringTween extends AbstractTweenable {
-        readonly targetType: TransformTargetType;
+        get targetType(): TransformTargetType;
         private _transform;
         private _targetType;
         private _targetValue;
@@ -4548,7 +4601,7 @@ declare module es {
         /**
          * 当通过StartCoroutine调用时，这将一直持续到tween完成
          */
-        waitForCompletion(): IterableIterator<any>;
+        waitForCompletion(): Generator<any, void, unknown>;
         getTargetObject(): any;
         private resetState;
         /**
@@ -4679,7 +4732,8 @@ declare module es {
         /**
          * 获取或设置管理器是否启用
          */
-        enabled: boolean;
+        get enabled(): boolean;
+        set enabled(value: boolean);
         /**
          * 设置管理器是否启用
          * @param isEnabled 如果为true，则启用管理器；否则禁用管理器
@@ -4719,7 +4773,7 @@ declare module es {
          * 当前所有活跃用户的内部列表
          */
         private _activeTweens;
-        static readonly activeTweens: ITweenable[];
+        static get activeTweens(): ITweenable[];
         private _tempTweens;
         private _isUpdating;
         private static _instance;
@@ -5247,7 +5301,7 @@ declare module es {
         value: number;
     }
     class AnimCurve {
-        readonly points: IAnimFrame[];
+        get points(): IAnimFrame[];
         constructor(points: IAnimFrame[]);
         lerp(t: number): number;
         _points: IAnimFrame[];
@@ -5412,8 +5466,9 @@ declare module es {
     }
     class ValueChangeCommand<T> implements IObservable {
         constructor(value: T);
-        readonly onValueChange: Observable;
-        value: T;
+        get onValueChange(): Observable;
+        get value(): T;
+        set value(newValue: T);
         dispatch(value: T): void;
         addListener(caller: object, callback: Function): void;
         removeListener(caller: object, callback: Function): void;
@@ -5439,8 +5494,8 @@ declare module es {
     class Screen {
         static width: number;
         static height: number;
-        static readonly size: Vector2;
-        static readonly center: Vector2;
+        static get size(): Vector2;
+        static get center(): Vector2;
     }
 }
 declare module es {
@@ -5496,7 +5551,7 @@ declare namespace es {
     /**
      * 记录时间的持续时间，一些设计灵感来自物理秒表。
      */
-    class Stopwatch {
+    export class Stopwatch {
         private readonly getSystemTime;
         /**
          * 秒表启动的系统时间。
@@ -5583,7 +5638,7 @@ declare namespace es {
      * 返回某个系统的“当前时间”的函数。
      * 惟一的要求是，对该函数的每次调用都必须返回一个大于或等于前一次对该函数的调用的数字。
      */
-    type GetTimeFunc = () => number;
+    export type GetTimeFunc = () => number;
     enum State {
         /** 秒表尚未启动，或已复位。 */
         IDLE = "IDLE",
@@ -5592,7 +5647,7 @@ declare namespace es {
         /** 秒表以前还在跑，但现在已经停了。 */
         STOPPED = "STOPPED"
     }
-    function setDefaultSystemTimeGetter(systemTimeGetter?: GetTimeFunc): void;
+    export function setDefaultSystemTimeGetter(systemTimeGetter?: GetTimeFunc): void;
     /**
      * 由秒表记录的单个“薄片”的测量值
      */
@@ -5604,6 +5659,7 @@ declare namespace es {
         /** 该切片的运行时间 */
         readonly duration: number;
     }
+    export {};
 }
 declare module es {
     class Bag<E> implements ImmutableBag<E> {
@@ -5639,7 +5695,7 @@ declare module es {
     }
 }
 declare module es {
-    class Node<T> {
+    export class Node<T> {
         element: T;
         next: Node<T>;
         constructor(element: T, next?: Node<T>);
@@ -5647,8 +5703,8 @@ declare module es {
     interface equalsFnType<T> {
         (a: T, b: T): boolean;
     }
-    function defaultEquals<T>(a: T, b: T): boolean;
-    class LinkedList<T> {
+    export function defaultEquals<T>(a: T, b: T): boolean;
+    export class LinkedList<T> {
         protected count: number;
         protected next: any;
         protected equalsFn: equalsFnType<T>;
@@ -5666,6 +5722,7 @@ declare module es {
         getHead(): Node<T>;
         toString(): string;
     }
+    export {};
 }
 declare module es {
     /**
@@ -5713,7 +5770,7 @@ declare module es {
 }
 declare module es {
     class PairSet<T> {
-        readonly all: Array<Pair<T>>;
+        get all(): Array<Pair<T>>;
         has(pair: Pair<T>): boolean;
         add(pair: Pair<T>): void;
         remove(pair: Pair<T>): void;
@@ -5980,7 +6037,7 @@ declare module es {
         /**
          * 判断是否原生支持Base64位解析
          */
-        static readonly nativeBase64: boolean;
+        static get nativeBase64(): boolean;
         /**
          * 解码
          * @param input
@@ -6320,7 +6377,7 @@ declare module es {
 }
 declare module es {
     type PredicateType<T> = (value?: T, index?: number, list?: T[]) => boolean;
-    class List<T> {
+    export class List<T> {
         protected _elements: T[];
         /**
          * 默认为列表的元素
@@ -6654,7 +6711,7 @@ declare module es {
          * 将数组转换为一个 Set 对象
          * @returns Set 对象，其中包含了数组中的所有元素
          */
-        toSet(): Set<any>;
+        toSet(): Set<unknown>;
         /**
          * 将数组转换为一个查找表，根据指定的键对元素进行分组并返回一个包含键值对的对象
          * @param keySelector 指定的键，用于分组
@@ -6683,7 +6740,7 @@ declare module es {
      * 即时返回值是一个存储执行操作所需的所有信息的对象。
      * 在通过调用对象的ToDictionary、ToLookup、ToList或ToArray方法枚举对象之前，不会执行由该方法表示的查询
      */
-    class OrderedList<T> extends List<T> {
+    export class OrderedList<T> extends List<T> {
         private _comparer;
         constructor(elements: T[], _comparer: (a: T, b: T) => number);
         /**
@@ -6697,6 +6754,7 @@ declare module es {
          */
         thenByDescending(keySelector: (key: T) => any): List<T>;
     }
+    export {};
 }
 declare module es {
     /**
