@@ -837,6 +837,11 @@ declare module es {
          * @param name
          */
         findEntity(name: string): Entity;
+        /**
+         * 返回最后一个找到的名字为name的实体。如果没有找到则返回null
+         * @param name
+         */
+        findEntityRight(name: string): Entity;
         findEntityById(id: number): Entity;
         /**
          * 返回具有给定标记的所有实体

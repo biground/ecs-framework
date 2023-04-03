@@ -207,6 +207,13 @@ module es {
         public findEntity(name: string): Entity {
             return this.entities.findEntity(name);
         }
+        /**
+         * 返回最后一个找到的名字为name的实体。如果没有找到则返回null
+         * @param name
+         */
+        public findEntityRight(name: string) {
+            return this.entities.findEntityRight(name);
+        }
 
         public findEntityById(id: number): Entity {
             return this.entities.findEntityById(id);
