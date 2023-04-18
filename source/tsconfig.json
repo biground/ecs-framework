@@ -21,6 +21,13 @@
     "libs"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/Debug/*",
+    "src/Utils/Analysis/*",
+    "src/Utils/DynamicAtlas/*",
+    "src/ECS/Components/Physics/ArcadeRigidbody.ts",
+    "src/ECS/Components/Physics/CharacterController.ts",
+    "src/ECS/Components/Physics/Mover.ts",
+    "src/ECS/Components/Physics/ProjectileMover.ts",
   ]
 }

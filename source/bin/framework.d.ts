@@ -89,7 +89,7 @@ declare module es {
          * null将使coroutine在下一帧被执行。
          * @param enumerator
          */
-        static startCoroutine(enumerator: any): ICoroutine;
+        static startCoroutine(enumerator: any): CoroutineImpl;
         /**
          * 调度一个一次性或重复的计时器，该计时器将调用已传递的动作
          * @param timeInSeconds
@@ -110,76 +110,6 @@ declare module es {
          */
         protected update(currentTime?: number): void;
         protected draw(): void;
-    }
-}
-declare module es {
-    enum LogType {
-        error = 0,
-        warn = 1,
-        log = 2,
-        info = 3,
-        trace = 4
-    }
-    class Debug {
-        /**
-         * 如果条件为true，则在控制台中以警告方式打印消息。
-         * @param condition 是否应该打印消息的条件
-         * @param format 要打印的消息格式
-         * @param args 与消息格式相对应的参数列表
-         */
-        static warnIf(condition: boolean, format: string, ...args: any[]): void;
-        /**
-         * 在控制台中以警告方式打印消息。
-         * @param format 要打印的消息格式
-         * @param args 与消息格式相对应的参数列表
-         */
-        static warn(format: string, ...args: any[]): void;
-        /**
-         * 在控制台中以错误方式打印消息。
-         * @param format 要打印的消息格式
-         * @param args 与消息格式相对应的参数列表
-         */
-        static error(format: string, ...args: any[]): void;
-        /**
-         * 在控制台中以标准日志方式打印消息。
-         * @param type 要打印的日志类型
-         * @param format 要打印的消息格式
-         * @param args 与消息格式相对应的参数列表
-         */
-        static log(type: LogType, format: string, ...args: any[]): void;
-    }
-}
-declare module es {
-    /**
-     * 我们在这里存储了各种系统的默认颜色，如对撞机调试渲染、Debug.drawText等。
-     * 命名方式尽可能采用CLASS-THING，以明确它的使用位置
-     */
-    class DebugDefault {
-        static debugText: number;
-        static colliderBounds: number;
-        static colliderEdge: number;
-        static colliderPosition: number;
-        static colliderCenter: number;
-        static renderableBounds: number;
-        static renderableCenter: number;
-        static verletParticle: number;
-        static verletConstraintEdge: number;
-    }
-}
-declare module es {
-    class Insist {
-        static fail(message?: string, ...args: any[]): void;
-        static isTrue(condition: boolean, message?: string, ...args: any[]): void;
-        static isFalse(condition: boolean, message?: string, ...args: any[]): void;
-        static isNull(obj: any, message?: string, ...args: any[]): void;
-        static isNotNull(obj: any, message?: string, ...args: any[]): void;
-        static areEqual(first: any, second: any, message: string, ...args: any[]): void;
-        static areNotEqual(first: any, second: any, message: string, ...args: any[]): void;
-    }
-}
-declare module es {
-    class DebugConsole {
-        static Instance: DebugConsole;
     }
 }
 declare module es {
@@ -332,7 +262,7 @@ declare module es {
         /**
          * 实体的渲染对象
          * */
-        readonly stageObj: Laya.Sprite;
+        stageObj: Laya.Sprite;
         /**
          * 当前附加到此实体的所有组件的列表
          */
@@ -1206,232 +1136,6 @@ declare module es {
 }
 declare module es {
     /**
-     * 请注意，这不是一个完整的、多迭代的物理系统！它可以用于简单的、街机风格的物理。
-     * 这可以用于简单的，街机风格的物理学
-     */
-    class ArcadeRigidbody extends Component implements IUpdatable {
-        /** 这个刚体的质量。质量为0，则是一个不可移动的物体 */
-        get mass(): number;
-        set mass(value: number);
-        /**
-         * 0-1范围，其中0为无反弹，1为完全反射。
-         */
-        get elasticity(): number;
-        set elasticiy(value: number);
-        /**
-         * 0 - 1范围。0表示没有摩擦力，1表示物体会停止在原地
-         */
-        get friction(): number;
-        set friction(value: number);
-        /**
-         * 0-9的范围。当发生碰撞时，沿碰撞面做直线运动时，如果其平方幅度小于glue摩擦力，则将碰撞设置为上限
-         */
-        get glue(): number;
-        set glue(value: number);
-        /**
-         *  如果为真，则每一帧都会考虑到Physics.gravity
-         */
-        shouldUseGravity: boolean;
-        /**
-         * 该刚体的速度
-         */
-        velocity: Vector2;
-        /**
-         * 质量为0的刚体被认为是不可移动的。改变速度和碰撞对它们没有影响
-         */
-        get isImmovable(): boolean;
-        _mass: number;
-        _elasticity: number;
-        _friction: number;
-        _glue: number;
-        _inverseMass: number;
-        _collider: Collider;
-        constructor();
-        /**
-         * 这个刚体的质量。质量为0，则是一个不可移动的物体
-         * @param mass
-         */
-        setMass(mass: number): ArcadeRigidbody;
-        /**
-         * 0-1范围，其中0为无反弹，1为完全反射。
-         * @param value
-         */
-        setElasticity(value: number): ArcadeRigidbody;
-        /**
-         * 0 - 1范围。0表示没有摩擦力，1表示物体会停止在原地
-         * @param value
-         */
-        setFriction(value: number): ArcadeRigidbody;
-        /**
-         * 0-9的范围。当发生碰撞时，沿碰撞面做直线运动时，如果其平方幅度小于glue摩擦力，则将碰撞设置为上限
-         * @param value
-         */
-        setGlue(value: number): ArcadeRigidbody;
-        setVelocity(velocity: Vector2): ArcadeRigidbody;
-        /**
-         * 用刚体的质量给刚体加上一个瞬间的力脉冲。力是一个加速度，单位是每秒像素每秒。将力乘以100000，使数值使用更合理
-         * @param force
-         */
-        addImpulse(force: Vector2): void;
-        onAddedToEntity(): void;
-        update(): void;
-        /**
-         * 将两个重叠的刚体分开。也处理其中一个不可移动的情况
-         * @param other
-         * @param minimumTranslationVector
-         */
-        processOverlap(other: ArcadeRigidbody, minimumTranslationVector: Vector2): void;
-        /**
-         * 处理两个非重叠的刚体的碰撞。新的速度将根据情况分配给每个刚体
-         * @param other
-         * @param minimumTranslationVector
-         */
-        processCollision(other: ArcadeRigidbody, minimumTranslationVector: Vector2): void;
-        /**
-         *  给定两个物体和MTV之间的相对速度，本方法修改相对速度，使其成为碰撞响应
-         * @param relativeVelocity
-         * @param minimumTranslationVector
-         * @param responseVelocity
-         */
-        calculateResponseVelocity(relativeVelocity: Vector2, minimumTranslationVector: Vector2): Vector2;
-    }
-}
-declare module es {
-    class CharacterCollisionState2D {
-        right: boolean;
-        left: boolean;
-        above: boolean;
-        below: boolean;
-        becameGroundedThisFrame: boolean;
-        wasGroundedLastFrame: boolean;
-        movingDownSlope: boolean;
-        slopeAngle: number;
-        hasCollision(): boolean;
-        reset(): void;
-        toString(): string;
-    }
-    export class CharacterController implements ITriggerListener {
-        onControllerCollidedEvent: ObservableT<RaycastHit>;
-        onTriggerEnterEvent: ObservableT<Collider>;
-        onTriggerExitEvent: ObservableT<Collider>;
-        /**
-         * 如果为 true，则在垂直移动单帧时将忽略平台的一种方式
-         */
-        ignoreOneWayPlatformsTime: number;
-        supportSlopedOneWayPlatforms: boolean;
-        ignoredColliders: Set<Collider>;
-        /**
-         * 定义距离碰撞射线的边缘有多远。
-         * 如果使用 0 范围进行投射，则通常会导致不需要的光线击中（例如，直接从表面水平投射的足部碰撞器可能会导致击中）
-         */
-        get skinWidth(): number;
-        set skinWidth(value: number);
-        /**
-         * CC2D 可以爬升的最大坡度角
-         */
-        slopeLimit: number;
-        /**
-         * 构成跳跃的帧之间垂直运动变化的阈值
-         */
-        jumpingThreshold: number;
-        /**
-         * 基于斜率乘以速度的曲线（负 = 下坡和正 = 上坡）
-         */
-        slopeSpeedMultiplier: AnimCurve;
-        totalHorizontalRays: number;
-        totalVerticalRays: number;
-        collisionState: CharacterCollisionState2D;
-        velocity: Vector2;
-        get isGrounded(): boolean;
-        get raycastHitsThisFrame(): RaycastHit[];
-        constructor(player: Entity, skinWidth?: number, platformMask?: number, onewayPlatformMask?: number, triggerMask?: number);
-        onTriggerEnter(other: Collider, local: Collider): void;
-        onTriggerExit(other: Collider, local: Collider): void;
-        /**
-         * 尝试将角色移动到位置 + deltaMovement。 任何挡路的碰撞器都会在遇到时导致运动停止
-         * @param deltaMovement
-         * @param deltaTime
-         */
-        move(deltaMovement: Vector2, deltaTime: number): void;
-        /**
-         * 直接向下移动直到接地
-         * @param maxDistance
-         */
-        warpToGrounded(maxDistance?: number): void;
-        /**
-         * 这应该在您必须在运行时修改 BoxCollider2D 的任何时候调用。
-         * 它将重新计算用于碰撞检测的光线之间的距离。
-         * 它也用于 skinWidth setter，以防在运行时更改。
-         */
-        recalculateDistanceBetweenRays(): void;
-        /**
-         * 将 raycastOrigins 重置为由 skinWidth 插入的框碰撞器的当前范围。
-         * 插入它是为了避免从直接接触另一个碰撞器的位置投射光线，从而导致不稳定的法线数据。
-         */
-        private primeRaycastOrigins;
-        /**
-         * 我们必须在这方面使用一些技巧。
-         * 光线必须从我们的碰撞器（skinWidth）内部的一小段距离投射，以避免零距离光线会得到错误的法线。
-         * 由于这个小偏移，我们必须增加光线距离 skinWidth 然后记住在实际移动玩家之前从 deltaMovement 中删除 skinWidth
-         * @param deltaMovement
-         * @returns
-         */
-        private moveHorizontally;
-        private moveVertically;
-        /**
-         * 检查 BoxCollider2D 下的中心点是否存在坡度。
-         * 如果找到一个，则调整 deltaMovement 以便玩家保持接地，并考虑slopeSpeedModifier 以加快移动速度。
-         * @param deltaMovement
-         * @returns
-         */
-        private handleVerticalSlope;
-        /**
-         * 如果我们要上坡，则处理调整 deltaMovement
-         * @param deltaMovement
-         * @param angle
-         * @returns
-         */
-        private handleHorizontalSlope;
-        private _player;
-        private _collider;
-        private _skinWidth;
-        private _triggerHelper;
-        /**
-         * 这用于计算为检查坡度而投射的向下光线。
-         * 我们使用有点随意的值 75 度来计算检查斜率的射线的长度。
-         */
-        private _slopeLimitTangent;
-        private readonly kSkinWidthFloatFudgeFactor;
-        /**
-         * 我们的光线投射原点角的支架（TR、TL、BR、BL）
-         */
-        private _raycastOrigins;
-        /**
-         * 存储我们在移动过程中命中的光线投射
-         */
-        private _raycastHit;
-        /**
-         * 存储此帧发生的任何光线投射命中。
-         * 我们必须存储它们，以防我们遇到水平和垂直移动的碰撞，以便我们可以在设置所有碰撞状态后发送事件
-         */
-        private _raycastHitsThisFrame;
-        private _verticalDistanceBetweenRays;
-        private _horizontalDistanceBetweenRays;
-        /**
-         * 我们使用这个标志来标记我们正在爬坡的情况，我们修改了 delta.y 以允许爬升。
-         * 原因是，如果我们到达斜坡的尽头，我们可以进行调整以保持接地
-         */
-        private _isGoingUpSlope;
-        private _isWarpingToGround;
-        private platformMask;
-        private triggerMask;
-        private oneWayPlatformMask;
-        private readonly rayOriginSkinMutiplier;
-    }
-    export {};
-}
-declare module es {
-    /**
      * 当添加到组件时，每当实体上的冲突器与另一个组件重叠/退出时，将调用这些方法。
      * ITriggerListener方法将在实现接口的触发器实体上的任何组件上调用。
      * 注意，这个接口只与Mover类一起工作
@@ -1457,55 +1161,9 @@ declare module es {
     var isITriggerListener: (props: any) => props is ITriggerListener;
 }
 declare module es {
-    /**
-     * 辅助类说明了一种处理移动的方法，它考虑了包括触发器在内的所有冲突。
-     * ITriggerListener接口用于管理对移动过程中违反的任何触发器的回调。
-     * 一个物体只能通过移动器移动。要正确报告触发器的move方法。
-     *
-     * 请注意，多个移动者相互交互将多次调用ITriggerListener。
-     */
-    class Mover extends Component {
-        private _triggerHelper;
-        onAddedToEntity(): void;
-        /**
-         * 计算修改运动矢量的运动，以考虑移动时可能发生的碰撞
-         * @param motion
-         * @param collisionResult
-         */
-        calculateMovement(motion: Vector2, collisionResult: Out<CollisionResult>): boolean;
-        /**
-         *  将calculatemomovement应用到实体并更新triggerHelper
-         * @param motion
-         */
-        applyMovement(motion: Vector2): void;
-        /**
-         * 通过调用calculateMovement和applyMovement来移动考虑碰撞的实体;
-         * @param motion
-         * @param collisionResult
-         */
-        move(motion: Vector2, collisionResult: Out<CollisionResult>): boolean;
-    }
-}
-declare module es {
-    /**
-     * 移动时考虑到碰撞，只用于向任何ITriggerListeners报告。
-     * 物体总是会全量移动，所以如果需要的话，由调用者在撞击时销毁它。
-     */
-    class ProjectileMover extends Component {
-        private _tempTriggerList;
-        private _collider;
-        onAddedToEntity(): void;
-        /**
-         * 在考虑到碰撞的情况下移动实体
-         * @param motion
-         */
-        move(motion: Vector2): boolean;
-        private notifyTriggerListeners;
-    }
-}
-declare module es {
     class Collider extends Component {
         static readonly lateSortOrder = 999;
+        drawCollider: Function;
         castSortOrder: number;
         /**
          * 对撞机的基本形状
@@ -3810,10 +3468,10 @@ declare module es {
         static overlapCircle(center: Vector2, radius: number, layerMask?: number): Collider;
         /**
          * 获取所有落在指定圆圈内的碰撞器
-         * @param center
-         * @param randius
-         * @param results
-         * @param layerMask
+         * @param center 圆心
+         * @param randius 半径
+         * @param results 碰撞结果
+         * @param layerMask 碰撞层
          */
         static overlapCircleAll(center: Vector2, radius: number, results: Collider[], layerMask?: number): number;
         /**
@@ -5551,120 +5209,6 @@ declare module es {
     interface Class extends Function {
     }
     function getClassName(klass: any): string;
-}
-declare namespace es {
-    /**
-     * 记录时间的持续时间，一些设计灵感来自物理秒表。
-     */
-    export class Stopwatch {
-        private readonly getSystemTime;
-        /**
-         * 秒表启动的系统时间。
-         * undefined，如果秒表尚未启动，或已复位。
-         */
-        private _startSystemTime;
-        /**
-         * 秒表停止的系统时间。
-         * undefined，如果秒表目前没有停止，尚未开始，或已复位。
-         */
-        private _stopSystemTime;
-        /** 自上次复位以来，秒表已停止的系统时间总数。 */
-        private _stopDuration;
-        /**
-         * 用秒表计时，当前等待的切片开始的时间。
-         * undefined，如果秒表尚未启动，或已复位。
-         */
-        private _pendingSliceStartStopwatchTime;
-        /**
-         * 记录自上次复位以来所有已完成切片的结果。
-         */
-        private _completeSlices;
-        constructor(getSystemTime?: GetTimeFunc);
-        getState(): State;
-        isIdle(): boolean;
-        isRunning(): boolean;
-        isStopped(): boolean;
-        /**
-         *
-         */
-        slice(): Slice;
-        /**
-         * 获取自上次复位以来该秒表已完成/记录的所有片的列表。
-         */
-        getCompletedSlices(): Slice[];
-        /**
-         * 获取自上次重置以来该秒表已完成/记录的所有片的列表，以及当前挂起的片。
-         */
-        getCompletedAndPendingSlices(): Slice[];
-        /**
-         * 获取关于这个秒表当前挂起的切片的详细信息。
-         */
-        getPendingSlice(): Slice;
-        /**
-         * 获取当前秒表时间。这是这个秒表自上次复位以来运行的系统时间总数。
-         */
-        getTime(): number;
-        /**
-         * 完全重置这个秒表到它的初始状态。清除所有记录的运行持续时间、切片等。
-         */
-        reset(): void;
-        /**
-         * 开始(或继续)运行秒表。
-         * @param forceReset
-         */
-        start(forceReset?: boolean): void;
-        /**
-         *
-         * @param recordPendingSlice
-         */
-        stop(recordPendingSlice?: boolean): number;
-        /**
-         * 计算指定秒表时间的当前挂起片。
-         * @param endStopwatchTime
-         */
-        private calculatePendingSlice;
-        /**
-         * 计算指定系统时间的当前秒表时间。
-         * @param endSystemTime
-         */
-        private caculateStopwatchTime;
-        /**
-         * 获取与当前秒表时间等效的系统时间。
-         * 如果该秒表当前停止，则返回该秒表停止时的系统时间。
-         */
-        private getSystemTimeOfCurrentStopwatchTime;
-        /**
-         * 结束/记录当前挂起的片的私有实现。
-         * @param endStopwatchTime
-         */
-        private recordPendingSlice;
-    }
-    /**
-     * 返回某个系统的“当前时间”的函数。
-     * 惟一的要求是，对该函数的每次调用都必须返回一个大于或等于前一次对该函数的调用的数字。
-     */
-    export type GetTimeFunc = () => number;
-    enum State {
-        /** 秒表尚未启动，或已复位。 */
-        IDLE = "IDLE",
-        /** 秒表正在运行。 */
-        RUNNING = "RUNNING",
-        /** 秒表以前还在跑，但现在已经停了。 */
-        STOPPED = "STOPPED"
-    }
-    export function setDefaultSystemTimeGetter(systemTimeGetter?: GetTimeFunc): void;
-    /**
-     * 由秒表记录的单个“薄片”的测量值
-     */
-    interface Slice {
-        /** 秒表显示的时间在这一片开始的时候。 */
-        readonly startTime: number;
-        /** 秒表在这片片尾的时间。 */
-        readonly endTime: number;
-        /** 该切片的运行时间 */
-        readonly duration: number;
-    }
-    export {};
 }
 declare module es {
     class Bag<E> implements ImmutableBag<E> {

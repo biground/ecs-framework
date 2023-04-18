@@ -57,10 +57,10 @@ module es {
 
         /**
          * 获取所有落在指定圆圈内的碰撞器
-         * @param center
-         * @param randius
-         * @param results
-         * @param layerMask
+         * @param center 圆心
+         * @param randius 半径
+         * @param results 碰撞结果
+         * @param layerMask 碰撞层
          */
         public static overlapCircleAll(center: Vector2, radius: number, results: Collider[], layerMask: number = this.allLayers) {
             return this._spatialHash.overlapCircle(

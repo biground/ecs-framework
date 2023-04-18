@@ -1,6 +1,7 @@
 module es {
     export class Collider extends Component {
         public static readonly lateSortOrder = 999;
+        public drawCollider: Function;
         public castSortOrder: number = 0;
         /**
          * 对撞机的基本形状
@@ -61,6 +62,9 @@ module es {
         public get bounds(): Rectangle {
             if (this._isPositionDirty || this._isRotationDirty) {
                 this.shape.recalculateBounds(this);
+                if (this.drawCollider) {
+                    this.drawCollider.call(this);
+                }
                 this._isPositionDirty = this._isRotationDirty = false;
             }
 

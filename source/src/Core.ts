@@ -81,8 +81,6 @@ module es {
          * @param value
          */
         public static set scene(value: Scene) {
-            Insist.isNotNull(value, "场景不能为空");
-
             if (this._instance._scene == null) {
                 this._instance._scene = value;
                 this._instance.onSceneChanged();
@@ -143,7 +141,6 @@ module es {
          * @param sceneTransition
          */
         public static startSceneTransition<T extends SceneTransition>(sceneTransition: T) {
-            Insist.isNull(this._instance._sceneTransition, "在前一个场景转换完成之前，无法启动新的场景转换");
             this._instance._sceneTransition = sceneTransition;
             return sceneTransition;
         }
@@ -153,7 +150,7 @@ module es {
          * null将使coroutine在下一帧被执行。
          * @param enumerator
          */
-        public static startCoroutine(enumerator): ICoroutine {
+        public static startCoroutine(enumerator): CoroutineImpl {
             return this._instance._coroutineManager.startCoroutine(enumerator);
         }
 

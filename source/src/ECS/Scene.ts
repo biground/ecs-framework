@@ -162,7 +162,6 @@ module es {
          */
         public removeSceneComponent(component: SceneComponent) {
             const sceneComponentList = new es.List(this._sceneComponents);
-            Insist.isTrue(sceneComponentList.contains(component), `SceneComponent${component}不在SceneComponents列表中!`);
             sceneComponentList.remove(component);
             component.onRemovedFromScene();
         }
@@ -181,7 +180,6 @@ module es {
          * @param entity
          */
         public addEntity(entity: Entity) {
-            Insist.isFalse(new es.List(this.entities.buffer).contains(entity), `您试图将同一实体添加到场景两次: ${entity}`);
             this.entities.add(entity);
             entity.scene = this;
 

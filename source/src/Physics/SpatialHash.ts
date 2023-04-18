@@ -81,7 +81,6 @@ module es {
                 for (let y = p1.y; y <= p2.y; y++) {
                     // 单元格应该始终存在，因为该碰撞器应该在所有查询的单元格中
                     const cell = this.cellAtPosition(x, y);
-                    Insist.isNotNull(cell, `从不存在碰撞器的单元格中移除碰撞器: [${collider}]`);
                     if (cell != null) {
                         new es.List(cell).remove(collider);
                     }
@@ -311,9 +310,9 @@ module es {
                         throw new Error("对这个对撞机类型的overlapCircle没有实现!");
                     }
 
-                    if (resultCounter === results.length) {
-                        return resultCounter;
-                    }
+                    // if (resultCounter === results.length) {
+                    //     return resultCounter;
+                    // }
                 }
             }
 

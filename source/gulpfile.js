@@ -1,11 +1,21 @@
 'use strict';
 const gulp = require('gulp');
-const { series, parallel } = require('gulp');
+const { series } = require('gulp');
 const minify = require('gulp-minify');
-const inject = require('gulp-inject-string');
 const ts = require('gulp-typescript');
 const merge = require('merge2');
 const tsProject = ts.createProject('tsconfig.json');
+
+function copy() {
+  return merge([
+    gulp.src('bin/framework.min.js')
+      .pipe(gulp.dest('../../SnakeSurvivor/bin/libs/min/')),
+    gulp.src('bin/framework.js')
+      .pipe(gulp.dest('../../SnakeSurvivor/bin/libs/')),
+    gulp.src('bin/*.ts')
+      .pipe(gulp.dest('../../SnakeSurvivor/libs/'))
+  ]);
+}
 
 function buildJs() {
   return tsProject.src()
@@ -23,4 +33,4 @@ function buildDts() {
 
 exports.buildJs = buildJs;
 exports.buildDts = buildDts;
-exports.build = series(buildJs, buildDts);
+exports.build = series(buildJs, buildDts, copy);

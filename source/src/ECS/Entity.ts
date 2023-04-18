@@ -26,10 +26,10 @@ module es {
          * 封装实体的位置/旋转/缩放，并允许设置一个高层结构
          */
         public readonly transform: Transform;
-        /** 
+        /**
          * 实体的渲染对象
          * */
-        public readonly stageObj: Laya.Sprite;
+        public stageObj: Laya.Sprite;
         /**
          * 当前附加到此实体的所有组件的列表
          */
@@ -442,7 +442,7 @@ module es {
          * @param type
          */
         public getOrCreateComponent<T extends Component>(type: new (...args) => T) {
-            let comp = this.components.getComponent<T>(type, true);
+            let comp = this.components.getComponent<T>(type, false);
             if (!comp) {
                 comp = this.addComponent<T>(new type());
             }
