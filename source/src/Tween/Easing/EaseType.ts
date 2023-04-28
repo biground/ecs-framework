@@ -185,6 +185,13 @@ module es {
                     return Easing.Quintic.easeOut(t, duration);
                 case EaseType.quintInOut:
                     return Easing.Quintic.easeInOut(t, duration);
+                    
+                case EaseType.quartIn:
+                    return Easing.Quartic.easeIn(t, duration);
+                case EaseType.quartOut:
+                    return Easing.Quartic.easeOut(t, duration);
+                case EaseType.quartInOut:
+                    return Easing.Quartic.easeInOut(t, duration);
 
                 case EaseType.sineIn:
                     return Easing.Sinusoidal.easeIn(t, duration);
