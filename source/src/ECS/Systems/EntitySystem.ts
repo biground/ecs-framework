@@ -5,6 +5,9 @@ module es {
      */
     export abstract class EntitySystem {
         private _entities: Entity[] = [];
+        get entities(): Entity[] {
+            return this._entities;
+        }
         private _updateOrder: number = 0;
         private _startTime = 0;
         private _endTime = 0;
