@@ -151,6 +151,25 @@ module es {
         }
 
         /**
+         * 获取具有指定标签的实体列表。
+         * 如果列表不存在，则创建一个新列表并返回。
+         * @param tag 实体标签
+         * @returns 具有指定标签的实体列表
+         */
+        public getBTagList(tag: number): Set<Entity> {
+            // 尝试从_entityDict中获取具有指定标签的实体列表
+            let list = this._entityDict.get(tag);
+
+            // 如果列表不存在，则创建一个新的Set实例，并添加到_entityDict中
+            if (!list) {
+                list = new Set<Entity>();
+                this._entityDict.set(tag, list);
+            }
+
+            return list;
+        }
+
+        /**
          * 添加实体到标签列表中。
          * @param entity 实体
          */
@@ -177,6 +196,39 @@ module es {
             if (list) {
                 list.delete(entity);
             }
+        }
+
+        /**
+         * 添加实体到标签列表中。
+         * @param entity 实体
+         */
+        public addToBTagList(entity: Entity, tag?) {
+            Flags.doActionInFlags(new Ref(tag || entity.BTag), (value) => {
+                // 获取标签列表
+                const list = this.getTagList(value);
+
+                // 将实体添加到标签列表中
+                list.add(entity);
+
+                // 添加未排序标志
+                this._unsortedTags.add(value);
+            })
+        }
+
+        /**
+         * 从标签列表中移除实体。
+         * @param entity 实体
+         */
+        public removeFromBTagList(entity: Entity) {
+            Flags.doActionInFlags(new Ref(entity.BTag), (value) => {
+                // 获取实体的标签列表
+                const list = this._entityDict.get(value);
+
+                // 如果标签列表存在，则从中移除实体
+                if (list) {
+                    list.delete(entity);
+                }
+            })
         }
 
         /**
@@ -228,7 +280,11 @@ module es {
                 for (const entity of this._entitiesToAddedList) {
                     this._entities.push(entity);
                     entity.scene = this.scene;
-                    this.addToTagList(entity);
+                    if (entity.BTag) {
+                        this.addToBTagList(entity)
+                    } else {
+                        this.addToTagList(entity);
+                    }
                 }
 
                 // 通知场景实体处理器，有新的实体已添加

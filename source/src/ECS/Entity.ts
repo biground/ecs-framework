@@ -2,8 +2,7 @@ module es {
     export class EntityComparer implements IComparer<Entity> {
         public compare(self: Entity, other: Entity): number {
             let compare = self.updateOrder - other.updateOrder;
-            if (compare == 0)
-                compare = self.id - other.id;
+            if (compare == 0) compare = self.id - other.id;
             return compare;
         }
     }
@@ -73,6 +72,22 @@ module es {
         public set tag(value: number) {
             this.setTag(value);
         }
+        /**
+         * 你可以随意使用。稍后可以使用它来查询场景中具有特定标记的所有实体
+         */
+        public get BTag(): number {
+            return this._btag.value;
+        }
+
+        /**
+         * 你可以随意使用。稍后可以使用它来查询场景中具有特定标记的所有实体
+         * @param value
+         */
+        public set BTag(value: number) {
+            this.setBTag(value);
+        }
+
+        private _btag = new Ref(0);
 
         private _enabled: boolean = true;
 
@@ -274,11 +289,34 @@ module es {
         public setTag(tag: number): Entity {
             if (this._tag != tag) {
                 // 我们只有在已经有场景的情况下才会调用entityTagList。如果我们还没有场景，我们会被添加到entityTagList
-                if (this.scene)
-                    this.scene.entities.removeFromTagList(this);
+                if (this.scene) this.scene.entities.removeFromTagList(this);
                 this._tag = tag;
-                if (this.scene)
-                    this.scene.entities.addToTagList(this);
+                if (this.scene) this.scene.entities.addToTagList(this);
+            }
+
+            return this;
+        }
+
+        /**
+         * 取消设置实体的标记
+         * @param tag
+         */
+        public unsetBTag(tag: number): Entity {
+            if (Flags.isFlagSet(this._btag.value, tag)) {
+                Flags.unsetFlag(this._btag, tag);
+                if (this.scene) this.scene.entities.removeFromBTagList(this);
+            }
+
+            return this;
+        }
+        /**
+         * 设置实体的标记
+         * @param tag
+         */
+        public setBTag(tag: number): Entity {
+            if (!Flags.isFlagSet(this._btag.value, tag)) {
+                Flags.setFlag(this._btag, tag);
+                if (this.scene) this.scene.entities.addToBTagList(this, tag);
             }
 
             return this;
@@ -292,10 +330,8 @@ module es {
             if (this._enabled != isEnabled) {
                 this._enabled = isEnabled;
 
-                if (this._enabled)
-                    this.components.onEntityEnabled();
-                else
-                    this.components.onEntityDisabled();
+                if (this._enabled) this.components.onEntityEnabled();
+                else this.components.onEntityDisabled();
             }
 
             return this;
@@ -361,16 +397,14 @@ module es {
         /**
          * 在提交了所有挂起的实体更改后，将此实体添加到场景时调用
          */
-        public onAddedToScene() {
-        }
+        public onAddedToScene() {}
 
         /**
          * 当此实体从场景中删除时调用
          */
         public onRemovedFromScene() {
             // 如果已经被销毁了，移走我们的组件。如果我们只是分离，我们需要保持我们的组件在实体上。
-            if (this._isDestroyed)
-                this.components.removeAllComponents();
+            if (this._isDestroyed) this.components.removeAllComponents();
         }
 
         /**
@@ -382,9 +416,11 @@ module es {
 
         /**
          * 创建组件的新实例。返回实例组件
-         * @param componentType 
+         * @param componentType
          */
-        public createComponent<T extends Component>(componentType: new (...args) => T): T {
+        public createComponent<T extends Component>(
+            componentType: new (...args) => T,
+        ): T {
             let component = new componentType();
             this.addComponent(component);
             return component;
@@ -411,20 +447,25 @@ module es {
 
         /**
          *  获取类型T的第一个并已加入场景的组件并返回它。如果没有找到组件，则返回null。
-         * @param type 
-         * @returns 
+         * @param type
+         * @returns
          */
-        public getComponentInScene<T extends Component>(type: new (...args) => T): T {
+        public getComponentInScene<T extends Component>(
+            type: new (...args) => T,
+        ): T {
             return this.components.getComponent(type, true);
         }
 
         /**
          * 尝试获取T类型的组件。如果未找到任何组件，则返回false
-         * @param type 
-         * @param outComponent 
-         * @returns 
+         * @param type
+         * @param outComponent
+         * @returns
          */
-        public tryGetComponent<T extends Component>(type: new (...args) => T, outComponent: Ref<T>): boolean {
+        public tryGetComponent<T extends Component>(
+            type: new (...args) => T,
+            outComponent: Ref<T>,
+        ): boolean {
             outComponent.value = this.components.getComponent<T>(type, false);
             return outComponent.value != null;
         }
@@ -441,7 +482,9 @@ module es {
          * 获取类型T的第一个组件并返回它。如果没有找到组件，将创建组件。
          * @param type
          */
-        public getOrCreateComponent<T extends Component>(type: new (...args) => T) {
+        public getOrCreateComponent<T extends Component>(
+            type: new (...args) => T,
+        ) {
             let comp = this.components.getComponent<T>(type, false);
             if (!comp) {
                 comp = this.addComponent<T>(new type());
@@ -455,7 +498,10 @@ module es {
          * @param typeName
          * @param componentList
          */
-        public getComponents(typeName: any, componentList?: any[]) {
+        public getComponents<T extends Component>(
+            typeName: new (...args: any[]) => T,
+            componentList?: T[],
+        ): T[] {
             return this.components.getComponents(typeName, componentList);
         }
 
@@ -490,17 +536,29 @@ module es {
             }
         }
 
-        public tweenPositionTo(to: Vector2, duration: number = 0.3): ITween<Vector2> {
+        public tweenPositionTo(
+            to: Vector2,
+            duration: number = 0.3,
+        ): ITween<Vector2> {
             const tween = Pool.obtain(TransformVector2Tween);
-            tween.setTargetAndType(this.transform, TransformTargetType.position);
+            tween.setTargetAndType(
+                this.transform,
+                TransformTargetType.position,
+            );
             tween.initialize(tween, to, duration);
 
             return tween;
         }
 
-        public tweenLocalPositionTo(to: Vector2, duration = 0.3): ITween<Vector2> {
+        public tweenLocalPositionTo(
+            to: Vector2,
+            duration = 0.3,
+        ): ITween<Vector2> {
             const tween = Pool.obtain(TransformVector2Tween);
-            tween.setTargetAndType(this.transform, TransformTargetType.localPosition);
+            tween.setTargetAndType(
+                this.transform,
+                TransformTargetType.localPosition,
+            );
             tween.initialize(tween, to, duration);
 
             return tween;
@@ -509,7 +567,7 @@ module es {
         public tweenScaleTo(to: Vector2, duration?: number);
         public tweenScaleTo(to: number, duration?: number);
         public tweenScaleTo(to: Vector2 | number, duration: number = 0.3) {
-            if (typeof (to) == 'number') {
+            if (typeof to == 'number') {
                 return this.tweenScaleTo(new Vector2(to, to), duration);
             }
 
@@ -523,12 +581,15 @@ module es {
         public tweenLocalScaleTo(to: Vector2, duration?);
         public tweenLocalScaleTo(to: number, duration?);
         public tweenLocalScaleTo(to: Vector2 | number, duration = 0.3) {
-            if (typeof (to) == 'number') {
+            if (typeof to == 'number') {
                 return this.tweenLocalScaleTo(new Vector2(to, to), duration);
             }
 
             const tween = Pool.obtain(TransformVector2Tween);
-            tween.setTargetAndType(this.transform, TransformTargetType.localScale);
+            tween.setTargetAndType(
+                this.transform,
+                TransformTargetType.localScale,
+            );
             tween.initialize(tween, to, duration);
 
             return tween;
@@ -536,7 +597,10 @@ module es {
 
         public tweenRotationDegreesTo(to: number, duration = 0.3) {
             const tween = Pool.obtain(TransformVector2Tween);
-            tween.setTargetAndType(this.transform, TransformTargetType.rotationDegrees);
+            tween.setTargetAndType(
+                this.transform,
+                TransformTargetType.rotationDegrees,
+            );
             tween.initialize(tween, new Vector2(to, to), duration);
 
             return tween;
@@ -544,7 +608,10 @@ module es {
 
         public tweenLocalRotationDegreesTo(to: number, duration = 0.3) {
             const tween = Pool.obtain(TransformVector2Tween);
-            tween.setTargetAndType(this.transform, TransformTargetType.localRotationDegrees);
+            tween.setTargetAndType(
+                this.transform,
+                TransformTargetType.localRotationDegrees,
+            );
             tween.initialize(tween, new Vector2(to, to), duration);
 
             return tween;
@@ -552,8 +619,7 @@ module es {
 
         public compareTo(other: Entity): number {
             let compare = this._updateOrder - other._updateOrder;
-            if (compare == 0)
-                compare = this.id - other.id;
+            if (compare == 0) compare = this.id - other.id;
             return compare;
         }
 
