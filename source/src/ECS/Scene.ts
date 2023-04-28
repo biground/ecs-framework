@@ -179,7 +179,7 @@ module es {
          * 在场景的实体列表中添加一个实体
          * @param entity
          */
-        public addEntity(entity: Entity) {
+        public addEntity<T extends Entity>(entity: T): T {
             this.entities.add(entity);
             entity.scene = this;
 
