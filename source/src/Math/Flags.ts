@@ -30,7 +30,7 @@ module es {
          * @param flag 标志位，应该为2的幂
          */
         public static setFlagExclusive(self: Ref<number>, flag: number) {
-            self.value = 1 << flag;
+            self.value = flag;
         }
 
         /**
@@ -39,6 +39,10 @@ module es {
          * @param flag 标志位，应该为2的幂
          */
         public static setFlag(self: Ref<number>, flag: number) {
+            self.value |= flag;
+        }
+
+        public static setUnshiftedFlag(self: Ref<number>, flag: number) {
             self.value |= 1 << flag;
         }
 
@@ -48,7 +52,6 @@ module es {
          * @param flag 标志位，应该为2的幂
          */
         public static unsetFlag(self: Ref<number>, flag: number) {
-            flag = 1 << flag;
             self.value &= ~flag;
         }
 
@@ -66,15 +69,23 @@ module es {
          * @param leftPadWidth 返回的字符串的最小宽度（在左侧填充0）
          * @returns 二进制数字的字符串表示形式
          */
-        public static binaryStringRepresentation(
-            self: number,
-            leftPadWidth = 10
-        ): string {
+        public static binaryStringRepresentation(self: number, leftPadWidth = 10): string {
             let str = self.toString(2);
             while (str.length < (leftPadWidth || 2)) {
-                str = "0" + str;
+                str = '0' + str;
             }
             return str;
+        }
+
+        /** 在所有的位中执行操作 */
+        public static doActionInFlags(self: Ref<number>, action: (value: number) => void) {
+            let position = 0;
+            do {
+                if (self.value & 1) {
+                    action(1 << position);
+                }
+                position++;
+            } while ((self.value >>= 1));
         }
     }
 }
