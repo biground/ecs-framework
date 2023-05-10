@@ -331,11 +331,11 @@ module es {
          * 返回最后一个找到的名字为name的实体。如果没有找到则返回null
          * @param name
          */
-        public findEntityRight(name: string) {
+        public findEntityRight(name: string, isEnable: boolean = true) {
             if (this._entities.length > 0) {
                 for (let i = this._entities.length - 1, s = 0; i >= s; --i) {
                     let entity = this._entities[i];
-                    if (entity.name == name)
+                    if (entity.name == name && (!isEnable || entity.enabled))
                         return entity;
                 }
             }

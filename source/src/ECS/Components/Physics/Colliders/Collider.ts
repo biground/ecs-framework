@@ -62,9 +62,6 @@ module es {
         public get bounds(): Rectangle {
             if (this._isPositionDirty || this._isRotationDirty) {
                 this.shape.recalculateBounds(this);
-                if (this.drawCollider) {
-                    this.drawCollider.call(this);
-                }
                 this._isPositionDirty = this._isRotationDirty = false;
             }
 

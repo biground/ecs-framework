@@ -7,6 +7,7 @@ module es {
          *
          * @param radius
          */
+        public _localOffsetLength: number = 0;
         constructor(radius: number = 1) {
             super();
 
