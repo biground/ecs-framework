@@ -9,13 +9,15 @@ module es {
          */
         constructor(points: Vector2[]) {
             super();
+            if (points) this.setPoints(points);
+        }
 
+        setPoints(points: Vector2[]) {
             // 第一点和最后一点决不能相同。我们想要一个开放的多边形
             let isPolygonClosed = points[0] == points[points.length - 1];
 
             // 最后一个移除
-            if (isPolygonClosed)
-                points = points.slice(0, points.length - 1);
+            if (isPolygonClosed) points = points.slice(0, points.length - 1);
 
             let center = Polygon.findPolygonCenter(points);
             this.setLocalOffset(center);

@@ -57,7 +57,8 @@ module es {
 
             // 如果缓存中有对象，弹出一个并返回
             if (objectQueue.length > 0) {
-                return objectQueue.pop();
+                const obj = objectQueue.pop();
+                return obj;
             }
 
             // 如果没有缓存对象，则创建一个新的对象并返回

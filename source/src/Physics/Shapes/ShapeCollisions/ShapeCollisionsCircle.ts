@@ -102,7 +102,7 @@ module es {
             const poly2Circle = circle.position.sub(polygon.position);
 
             // 首先，我们需要找到从圆到多边形的最近距离
-            const res = Polygon.getClosestPointOnPolygonToPoint(polygon.points, poly2Circle);
+            const res = Polygon.getClosestPointOnPolygonToPoint(polygon._originalPoints, poly2Circle);
             result.value.normal = res.edgeNormal;
 
             // 确保距离的平方小于半径的平方，否则我们不会相撞。

@@ -10,7 +10,7 @@ module es {
          * @returns 如果设置了指定的标志位，则返回true，否则返回false
          */
         public static isFlagSet(self: number, flag: number): boolean {
-            return (self & flag) !== 0;
+            return (self & flag) != 0;
         }
 
         /**
@@ -21,7 +21,7 @@ module es {
          */
         public static isUnshiftedFlagSet(self: number, flag: number): boolean {
             flag = 1 << flag;
-            return (self & flag) !== 0;
+            return (self & flag) != 0;
         }
 
         /**

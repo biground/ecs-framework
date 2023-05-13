@@ -132,5 +132,45 @@ module es {
             return furthestPoint;
         }
 
+        public recalculateBounds(collider: Collider) {
+            this.center = collider.localOffset;
+
+            if (collider.shouldColliderScaleAndRotateWithTransform) {
+                let hasUnitScale = true;
+                const tempMat = new Matrix2D();
+                const combinedMatrix = new Matrix2D();
+
+                Matrix2D.createTranslation(-this._polygonCenter.x, -this._polygonCenter.y, combinedMatrix);
+
+                const scale = collider.entity.transform.scale;
+                if (!scale.equals(Vector2.one)) {
+                    Matrix2D.createScale(scale.x, scale.y, tempMat);
+                    Matrix2D.multiply(combinedMatrix, tempMat, combinedMatrix);
+                    hasUnitScale = false;
+
+                    const scaledOffset = collider.localOffset.multiply(scale);
+                    this.center = scaledOffset;
+                }
+
+                const rotation = collider.entity.transform.rotationDegrees;
+                if (rotation !== 0) {
+                    const offsetLength = hasUnitScale ? collider._localOffsetLength : collider.localOffset.multiply(scale).magnitude();
+                    const offsetAngle = Math.atan2(collider.localOffset.y * scale.y, collider.localOffset.x * scale.x) * MathHelper.Rad2Deg;
+                    this.center = MathHelper.pointOnCircle(Vector2.zero, offsetLength, rotation + offsetAngle);
+                    Matrix2D.createRotation(MathHelper.Deg2Rad * rotation, tempMat);
+                    Matrix2D.multiply(combinedMatrix, tempMat, combinedMatrix);
+                }
+
+                Matrix2D.createTranslation(this._polygonCenter.x + collider.transform.position.x + this.center.x, this._polygonCenter.y + collider.transform.position.y + this.center.y, tempMat);
+                Matrix2D.multiply(combinedMatrix, tempMat, combinedMatrix);
+
+                this.points = this._originalPoints.map(p => p.transform(combinedMatrix));
+                this.isUnrotated = rotation === 0;
+                if (collider._isRotationDirty) this._areEdgeNormalsDirty = true;
+            }
+
+            this.position = collider.transform.position.add(this.center);
+            this.bounds = Rectangle.rectEncompassingPoints(this.points).offset(this.position.x, this.position.y);
+        }
     }
 }

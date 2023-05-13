@@ -82,7 +82,10 @@ module es {
                     // 单元格应该始终存在，因为该碰撞器应该在所有查询的单元格中
                     const cell = this.cellAtPosition(x, y);
                     if (cell != null) {
-                        new es.List(cell).remove(collider);
+                        // 调用 indexOf 方法，查找元素在列表中的索引值
+                        const index = cell.indexOf(collider);
+                        // 如果元素存在，则调用 removeAt 方法将其从列表中删除，并返回 true，否则返回 false
+                        index !== -1 && cell.splice(index, 1)
                     }
                 }
             }
@@ -113,7 +116,7 @@ module es {
             // 获取边界矩形所在的网格单元格
             const p1 = this.cellCoords(bounds.x, bounds.y);
             const p2 = this.cellCoords(bounds.right, bounds.bottom);
-
+            const excludeID = excludeCollider?.id || -1
             // 对所有相交的单元格中的碰撞器执行检测
             for (let x = p1.x; x <= p2.x; x++) {
                 for (let y = p1.y; y <= p2.y; y++) {
@@ -128,7 +131,7 @@ module es {
                             const collider = cell[i];
 
                             // 如果它是自身或者如果它不匹配我们的层掩码跳过这个碰撞器
-                            if (collider === excludeCollider || !Flags.isFlagSet(layerMask, collider.physicsLayer.value)) {
+                            if (collider.id == excludeID || !Flags.isFlagSet(layerMask, collider.physicsLayer.value)) {
                                 continue;
                             }
 
@@ -400,7 +403,7 @@ module es {
          * @returns 唯一的字符串键
          */
         public getKey(x: number, y: number) {
-            return `${x}_${y}`;
+            return x + '_' + y;
         }
 
         /**

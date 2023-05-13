@@ -30,7 +30,7 @@ module es {
          */
         public registeredPhysicsBounds: Rectangle = new Rectangle();
 
-        public _localOffsetLength: number;
+        public _localOffsetLength: number = 0;
         public _isPositionDirty: boolean = true;
         public _isRotationDirty: boolean = true;
         /**
@@ -53,8 +53,7 @@ module es {
          * 封装变换。如果碰撞器没和实体一起旋转 则返回transform.rotation
          */
         public get rotation(): number {
-            if (this.shouldColliderScaleAndRotateWithTransform && this.entity != null)
-                return this.entity.transform.rotation;
+            if (this.shouldColliderScaleAndRotateWithTransform && this.entity != null) return this.entity.transform.rotation;
 
             return 0;
         }
@@ -137,8 +136,7 @@ module es {
                     break;
             }
 
-            if (this._isColliderRegistered)
-                Physics.updateCollider(this);
+            if (this._isColliderRegistered) Physics.updateCollider(this);
         }
 
         public onEnabled() {
@@ -191,8 +189,7 @@ module es {
             this.entity.position = this.entity.position.add(motion);
 
             const didCollide = this.shape.collidesWithShape(collider.shape, result);
-            if (didCollide)
-                result.value.collider = collider;
+            if (didCollide) result.value.collider = collider;
 
             // 将图形位置返回到检查前的位置
             this.entity.position = oldPosition;
@@ -202,8 +199,8 @@ module es {
 
         /**
          * 检查这个对撞机是否与对撞机发生碰撞。如果碰撞，则返回true，结果将被填充
-         * @param collider 
-         * @param result 
+         * @param collider
+         * @param result
          */
         public collidesWithNonMotion(collider: Collider, result: Out<CollisionResult>): boolean {
             if (this.shape.collidesWithShape(collider.shape, result)) {
@@ -216,29 +213,28 @@ module es {
         }
 
         /**
-         * 检查此碰撞器是否已应用运动（增量运动矢量）与任何碰撞器发生碰撞。 
-         * 如果是这样，则将返回true，并且将使用碰撞数据填充结果。 运动将设置为碰撞器在碰撞之前可以行进的最大距离。 
-         * @param motion 
-         * @param result 
+         * 检查此碰撞器是否已应用运动（增量运动矢量）与任何碰撞器发生碰撞。
+         * 如果是这样，则将返回true，并且将使用碰撞数据填充结果。 运动将设置为碰撞器在碰撞之前可以行进的最大距离。
+         * @param motion
+         * @param result
          */
         public collidesWithAny(motion: Vector2, result: Out<CollisionResult>) {
             result.value = new CollisionResult();
 
-            // 在我们的新位置上获取我们可能会碰到的任何东西 
+            // 在我们的新位置上获取我们可能会碰到的任何东西
             let colliderBounds = this.bounds.clone();
             colliderBounds.x += motion.x;
             colliderBounds.y += motion.y;
             let neighbors = Physics.boxcastBroadphaseExcludingSelf(this, colliderBounds, this.collidesWithLayers.value);
 
-            // 更改形状位置，使其处于移动后的位置，以便我们检查是否有重叠 
+            // 更改形状位置，使其处于移动后的位置，以便我们检查是否有重叠
             let oldPosition = this.shape.position;
             this.shape.position = Vector2.add(this.shape.position, motion);
 
             let didCollide = false;
-            for (let i = 0; i < neighbors.length; i ++ ){
+            for (let i = 0; i < neighbors.length; i++) {
                 const neighbor = neighbors[i];
-                if (neighbor.isTrigger)
-                    continue;
+                if (neighbor.isTrigger) continue;
 
                 if (this.collidesWithNonMotion(neighbor, result)) {
                     motion = motion.sub(result.value.minimumTranslationVector);
@@ -247,7 +243,7 @@ module es {
                 }
             }
 
-            // 将形状位置返回到检查之前的位置 
+            // 将形状位置返回到检查之前的位置
             this.shape.position = oldPosition;
 
             return didCollide;
@@ -255,19 +251,17 @@ module es {
 
         /**
          * 检查此碰撞器是否与场景中的其他碰撞器碰撞。它相交的第一个碰撞器将在碰撞结果中返回碰撞数据。
-         * @param result 
+         * @param result
          */
         public collidesWithAnyNonMotion(result: Out<CollisionResult>) {
             result.value = new CollisionResult();
-            // 在我们的新位置上获取我们可能会碰到的任何东西 
+            // 在我们的新位置上获取我们可能会碰到的任何东西
             let neighbors = Physics.boxcastBroadphaseExcludingSelfNonRect(this, this.collidesWithLayers.value);
 
             for (let neighbor of neighbors) {
-                if (neighbor.isTrigger)
-                    continue;
+                if (neighbor.isTrigger) continue;
 
-                if (this.collidesWithNonMotion(neighbor, result))
-                    return true;
+                if (this.collidesWithNonMotion(neighbor, result)) return true;
             }
 
             return false;

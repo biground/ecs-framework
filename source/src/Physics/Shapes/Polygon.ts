@@ -256,7 +256,7 @@ module es {
             }
 
             this.position = collider.transform.position.add(this.center);
-            this.bounds = Rectangle.rectEncompassingPoints(this.points).offset(this.position.x, this.position.y);
+            this.bounds = Rectangle.rectEncompassingPoints(this.points).offset(collider.localOffset.x, collider.localOffset.y);
         }
 
         public overlaps(other: Shape) {
