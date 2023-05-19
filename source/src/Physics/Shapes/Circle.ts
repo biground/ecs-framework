@@ -34,15 +34,14 @@ module es {
         }
 
         public overlaps(other: Shape) {
-            const result = new Out<CollisionResult>();
-            if (other instanceof Box && (other as Box).isUnrotated)
-                return Collisions.rectToCircle(other.bounds, this.position, this.radius);
+            if (other instanceof Box && (other as Box).isUnrotated) return Collisions.rectToCircle(other.bounds, this.position, this.radius);
 
-            if (other instanceof Circle)
-                return Collisions.circleToCircle(this.position, this.radius, other.position, (other as Circle).radius);
+            if (other instanceof Circle) return Collisions.circleToCircle(this.position, this.radius, other.position, (other as Circle).radius);
 
-            if (other instanceof Polygon)
+            if (other instanceof Polygon) {
+                const result = new Out<CollisionResult>();
                 return ShapeCollisionsCircle.circleToPolygon(this, other, result);
+            }
 
             throw new Error(`overlaps of circle to ${other} are not supported`);
         }
@@ -68,18 +67,15 @@ module es {
         }
 
         public getPointAlongEdge(angle: number): Vector2 {
-            return new Vector2(
-              this.position.x + this.radius * Math.cos(angle),
-              this.position.y + this.radius * Math.sin(angle)
-            );
-          }
+            return new Vector2(this.position.x + this.radius * Math.cos(angle), this.position.y + this.radius * Math.sin(angle));
+        }
 
         /**
          * 获取所提供的点是否在此范围内
          * @param point
          */
         public containsPoint(point: Vector2) {
-            return (point.sub(this.position)).lengthSquared() <= this.radius * this.radius;
+            return point.sub(this.position).lengthSquared() <= this.radius * this.radius;
         }
 
         public pointCollidesWithShape(point: Vector2, result: Out<CollisionResult>): boolean {

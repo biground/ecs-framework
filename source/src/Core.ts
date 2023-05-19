@@ -150,7 +150,7 @@ module es {
          * null将使coroutine在下一帧被执行。
          * @param enumerator
          */
-        public static startCoroutine(enumerator): CoroutineImpl {
+        public static startCoroutine<T>(enumerator: Iterator<T> | (() => Iterator<T>)): CoroutineImpl | null {
             return this._instance._coroutineManager.startCoroutine(enumerator);
         }
 

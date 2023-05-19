@@ -67,7 +67,7 @@
          * 在前一个场景出现第一次（也是唯一一次）后调用。
          * 此时，可以在生成一帧后加载新场景（因此第一次渲染调用发生在场景加载之前）
          */
-        public * onBeginTransition(): any {
+        public * onBeginTransition() {
             yield null;
             yield Core.startCoroutine(this.LoadNextScene());
 

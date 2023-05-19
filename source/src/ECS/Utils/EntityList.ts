@@ -96,6 +96,12 @@ module es {
             }
         }
 
+        /** 移除尚未被添加的实体 */
+        public removeTemp() {
+            this._entitiesToAdded = {};
+            this._entitiesToAddedList.length = 0;
+        }
+
         /**
          * 从场景中移除所有实体。
          */
