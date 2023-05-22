@@ -12,6 +12,8 @@ module es {
         public numberOfPoints: number;
         public angleStep: number;
         public points: Vector2[];
+        // 扇形中线
+        public centerLine: Vector2;
 
         public get sectorAngle(): number {
             let angle = this.endAngle - this.startAngle;
@@ -189,9 +191,11 @@ module es {
             return points;
         }
 
+        
         private calculateProperties() {
             this.numberOfPoints = Math.max(10, Math.floor(this.radius * 0.1));
             this.angleStep = (this.endAngle - this.startAngle) / (this.numberOfPoints - 1);
+            this.centerLine = Vector2.fromAngle((this.endAngle + this.startAngle) / 2, this.radius);
         }
 
         public getFurthestPoint(normal: Vector2): Vector2 {
