@@ -23,6 +23,8 @@ module es {
             this.setLocalOffset(center);
             Polygon.recenterPolygonVerts(points);
             this.shape = new Polygon(points);
+            this.shape.recalculateBounds(this);
+            return points;
         }
     }
 }

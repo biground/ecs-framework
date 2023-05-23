@@ -85,7 +85,7 @@ module es {
                         // 调用 indexOf 方法，查找元素在列表中的索引值
                         const index = cell.indexOf(collider);
                         // 如果元素存在，则调用 removeAt 方法将其从列表中删除，并返回 true，否则返回 false
-                        index !== -1 && cell.splice(index, 1)
+                        index !== -1 && cell.splice(index, 1);
                     }
                 }
             }
@@ -116,7 +116,7 @@ module es {
             // 获取边界矩形所在的网格单元格
             const p1 = this.cellCoords(bounds.x, bounds.y);
             const p2 = this.cellCoords(bounds.right, bounds.bottom);
-            const excludeID = excludeCollider?.id || -1
+            const excludeID = excludeCollider?.id || -1;
             // 对所有相交的单元格中的碰撞器执行检测
             for (let x = p1.x; x <= p2.x; x++) {
                 for (let y = p1.y; y <= p2.y; y++) {
@@ -206,6 +206,7 @@ module es {
                     tMaxY += tDeltaY;
                 }
 
+                if (currentCell.x < 0 || currentCell.y < 0) break;
                 cell = this.cellAtPosition(currentCell.x, currentCell.y);
                 if (cell && this._raycastParser.checkRayIntersection(currentCell.x, currentCell.y, cell)) {
                     this._raycastParser.reset();
@@ -217,7 +218,6 @@ module es {
             this._raycastParser.reset();
             return this._raycastParser.hitCounter;
         }
-
 
         /**
          * 执行矩形重叠检测并返回所有命中的碰撞器
@@ -255,7 +255,7 @@ module es {
                         resultCounter++;
                     }
                 } else {
-                    throw new Error("overlapRectangle对这个类型没有实现!");
+                    throw new Error('overlapRectangle对这个类型没有实现!');
                 }
 
                 if (resultCounter === results.length) {
@@ -265,7 +265,6 @@ module es {
 
             return resultCounter;
         }
-
 
         /**
          * 执行圆形重叠检测并返回所有命中的碰撞器
@@ -310,7 +309,7 @@ module es {
                             resultCounter++;
                         }
                     } else {
-                        throw new Error("对这个对撞机类型的overlapCircle没有实现!");
+                        throw new Error('对这个对撞机类型的overlapCircle没有实现!');
                     }
 
                     // if (resultCounter === results.length) {
@@ -383,7 +382,7 @@ module es {
             this._store.forEach(list => {
                 let index = list.indexOf(obj);
                 list.splice(index, 1);
-            })
+            });
         }
 
         /**
@@ -452,19 +451,16 @@ module es {
                 const potential = cell[i];
 
                 // 如果该碰撞器已经处理过，则跳过它
-                if (this._checkedColliders.indexOf(potential) != -1)
-                    continue;
+                if (this._checkedColliders.indexOf(potential) != -1) continue;
 
                 // 将该碰撞器标记为已处理
                 this._checkedColliders.push(potential);
 
                 // 如果该碰撞器是触发器且当前不允许触发器响应射线检测，则跳过它
-                if (potential.isTrigger && !Physics.raycastsHitTriggers)
-                    continue;
+                if (potential.isTrigger && !Physics.raycastsHitTriggers) continue;
 
                 // 确保碰撞器的图层与所提供的图层掩码相匹配
-                if (!Flags.isFlagSet(this._layerMask, potential.physicsLayer.value))
-                    continue;
+                if (!Flags.isFlagSet(this._layerMask, potential.physicsLayer.value)) continue;
 
                 // 如果设置了要忽略的碰撞器并且该碰撞器是被忽略的，则跳过它
                 if (this._ignoredColliders && this._ignoredColliders.has(potential)) {
@@ -476,14 +472,14 @@ module es {
                 // 先进行一个边界检查
                 const colliderBounds = potential.bounds;
                 const res = colliderBounds.rayIntersects(this._ray);
-                if (res.intersected && res.distance <= 1) { // 只有当该碰撞器与射线相交且交点在射线长度范围内才进一步进行形状检测
+                if (res.intersected && res.distance <= 1) {
+                    // 只有当该碰撞器与射线相交且交点在射线长度范围内才进一步进行形状检测
                     let tempHit = new Out<RaycastHit>(this._tempHit);
 
                     // 调用形状的方法，检查该碰撞器是否与射线相交，并将结果保存在tempHit中
                     if (potential.shape.collidesWithLine(this._ray.start, this._ray.end, tempHit)) {
                         // 如果碰撞器包含射线起点，而且不允许射线起点在碰撞器中启动检测，那么跳过该碰撞器
-                        if (!Physics.raycastsStartInColliders && potential.shape.containsPoint(this._ray.start))
-                            continue;
+                        if (!Physics.raycastsStartInColliders && potential.shape.containsPoint(this._ray.start)) continue;
 
                         // 将碰撞信息添加到列表中
                         tempHit.value.collider = potential;
@@ -492,8 +488,7 @@ module es {
                 }
             }
 
-            if (this._cellHits.length === 0)
-                return false;
+            if (this._cellHits.length === 0) return false;
 
             // 所有处理单元完成。对结果进行排序并将命中结果打包到结果数组中
             this._cellHits = this._cellHits.sort(RaycastResultParser.compareRaycastHits);
@@ -502,8 +497,7 @@ module es {
 
                 // 增加命中计数器，如果它已经达到数组大小的限制，我们就完成了
                 this.hitCounter++;
-                if (this.hitCounter === this._hits.length)
-                    return true;
+                if (this.hitCounter === this._hits.length) return true;
             }
 
             return false;

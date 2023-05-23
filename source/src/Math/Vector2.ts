@@ -282,6 +282,11 @@ module es {
         public scale(size: number): Vector2 {
             return new Vector2(this.x * size, this.y * size);
         }
+        
+        /** 缩放时Y轴不会被翻转 */
+        public scaleSignX(size: number): Vector2 {
+            return new Vector2(this.x * size, this.y * Math.abs(size));
+        }
 
         public scaleEqual(size: number): Vector2 {
             this.x *= size;

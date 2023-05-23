@@ -51,36 +51,39 @@ module es {
             return collision;
         }
 
-        public static sectorToCircle2(first: Sector, second: Circle, result: Out<CollisionResult>): boolean {
-            const { center: a, centerLine: u, angle: theta, radius: l } = first;
-            const { position: c, radius: r } = second;
-            const d: Vector2 = c.sub(a);
-            const rsum = l + r;
-            const radiusSquared = second.radius * second.radius;
-            const distanceSquared = first.center.getDistanceSquared(second.position);
-            if (distanceSquared > radiusSquared) return false;
-            const px = d.dot(u);
-            const py = Math.abs(d.dot(Vector2Ext.perpendicularFlip(u)));
-            if (px > d.getLength() * Math.cos(theta)) {
-              return true;
+        public static sectorToCircle2(first: Sector, second: Circle): boolean {
+            let { center, centerLine, angle, radius: length } = first;
+            angle = angle / 2;
+            const { position, radius } = second;
+            const d = position.sub(center);
+            const dSqrtMagnitude = d.lengthSquared();
+            const rSum = length + radius;
+            if (dSqrtMagnitude > rSum * rSum) {
+                return false;
             }
-            const q = Vector2.fromAngle(theta, l);
+            const px = d.dot(centerLine);
+            const py = Math.abs(d.dot(Vector2Ext.perpendicularFlip(centerLine)));
+            if (px > Math.sqrt(dSqrtMagnitude) * Math.cos(angle)) {
+                return true;
+            }
+            const q = Vector2.fromAngle(angle).scale(length);
             const p = new Vector2(px, py);
-            const t = p.sub(Vector2.zero).dot(u) / u.lengthSquared();
-            return p.sub(Vector2.zero.add(u.scale(MathHelper.clamp01(t)))).lengthSquared() <= radiusSquared;
+
+            const t = p.dot(q) / q.lengthSquared();
+            return p.sub(q.scale(MathHelper.clamp01(t))).lengthSquared() <= radius * radius;
         }
 
         public static sectorToCircle(first: Sector, second: Circle, result: Out<CollisionResult>): boolean {
             const radiusSquared = second.radius * second.radius;
-            const distanceSquared = first.center.getDistanceSquared(second.center);
-            const angleDiff = Math.abs(second.center.sub(first.center).getAngle() - first.getAngle());
+            const distanceSquared = first.center.getDistanceSquared(second.position);
+            const angleDiff = Math.abs(second.position.sub(first.center).getAngle() - first.getAngle());
             const sectorAngle = first.endAngle - first.startAngle;
 
             if (distanceSquared <= radiusSquared && angleDiff <= sectorAngle / 2) {
                 if (result) {
                     result.value = new CollisionResult();
-                    result.value.normal = second.center.sub(first.center).normalize();
-                    result.value.point = second.center.clone().add(result.value.normal.clone().multiplyScaler(second.radius));
+                    result.value.normal = second.position.sub(first.center).normalize();
+                    result.value.point = second.position.clone().add(result.value.normal.clone().multiplyScaler(second.radius));
                 }
                 return true;
             }

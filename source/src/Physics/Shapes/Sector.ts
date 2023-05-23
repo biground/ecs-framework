@@ -5,15 +5,29 @@ module es {
     export class Sector extends Shape {
         public center: Vector2;
         public radius: number;
-        public startAngle: number;
-        public endAngle: number;
         public angle: number;
         public radiusSquared: number;
         public numberOfPoints: number;
         public angleStep: number;
         public points: Vector2[];
-        // 扇形中线
         public centerLine: Vector2;
+
+        private m_startAngle: number;
+        get startAngle(): number {
+            return this.m_startAngle;
+        }
+        set startAngle(startAngle: number) {
+            this.m_startAngle = startAngle;
+            this.calculateProperties();
+        }
+        private m_endAngle: number;
+        get endAngle(): number {
+            return this.m_endAngle;
+        }
+        set endAngle(endAngle: number) {
+            this.m_endAngle = endAngle;
+            this.calculateProperties();
+        }
 
         public get sectorAngle(): number {
             let angle = this.endAngle - this.startAngle;
@@ -25,8 +39,8 @@ module es {
             super();
             this.center = center;
             this.radius = radius;
-            this.startAngle = startAngle;
-            this.endAngle = endAngle;
+            this.m_startAngle = startAngle;
+            this.m_endAngle = endAngle;
             this.angle = endAngle - startAngle;
             this.radiusSquared = radius * radius;
             this.points = this.getPoints();
@@ -39,8 +53,8 @@ module es {
          */
         public getCentroid(): Vector2 {
             // 计算圆弧的质心坐标
-            const x = (Math.cos(this.startAngle) + Math.cos(this.endAngle)) * this.radius / 3;
-            const y = (Math.sin(this.startAngle) + Math.sin(this.endAngle)) * this.radius / 3;
+            const x = ((Math.cos(this.startAngle) + Math.cos(this.endAngle)) * this.radius) / 3;
+            const y = ((Math.sin(this.startAngle) + Math.sin(this.endAngle)) * this.radius) / 3;
             // 返回质心坐标
             return new Vector2(x + this.center.x, y + this.center.y);
         }
@@ -67,12 +81,10 @@ module es {
 
         public overlaps(other: Shape): boolean {
             let result = new Out<CollisionResult>();
-            if (other instanceof Polygon)
-                return ShapeCollisionSector.sectorToPolygon(this, other, result);
+            if (other instanceof Polygon) return ShapeCollisionSector.sectorToPolygon(this, other, result);
 
             if (other instanceof Circle) {
-                if (ShapeCollisionSector.sectorToCircle(this, other, result)) {
-                    result.value.invertResult();
+                if (ShapeCollisionSector.sectorToCircle2(this, other)) {
                     return true;
                 }
 
@@ -92,7 +104,7 @@ module es {
             }
 
             if (other instanceof Circle) {
-                return ShapeCollisionSector.sectorToCircle(this, other, collisionResult);
+                return ShapeCollisionSector.sectorToCircle2(this, other);
             }
 
             throw new Error(`overlaps of Polygon to ${other} are not supported`);
@@ -143,7 +155,8 @@ module es {
             const toPoint = point.sub(this.center); // 点到圆心的向量
             const distanceSquared = toPoint.lengthSquared(); // 点到圆心距离的平方
 
-            if (distanceSquared > this.radiusSquared) { // 如果点到圆心的距离平方大于圆形区域半径平方，则该点不在圆形区域内
+            if (distanceSquared > this.radiusSquared) {
+                // 如果点到圆心的距离平方大于圆形区域半径平方，则该点不在圆形区域内
                 return false;
             }
 
@@ -152,10 +165,12 @@ module es {
             const endAngle = startAngle + this.angle; // 圆弧终止角度
 
             let angleDiff = angle - startAngle; // 计算点到圆弧起始角度的角度差
-            if (angleDiff < 0) { // 如果角度差小于 0，则说明点在圆弧角度的另一侧，需要加上 2 * PI
+            if (angleDiff < 0) {
+                // 如果角度差小于 0，则说明点在圆弧角度的另一侧，需要加上 2 * PI
                 angleDiff += Math.PI * 2;
             }
-            if (angleDiff > this.angle) { // 如果角度差大于圆弧角度，则该点不在圆弧范围内
+            if (angleDiff > this.angle) {
+                // 如果角度差大于圆弧角度，则该点不在圆弧范围内
                 return false;
             }
 
@@ -173,9 +188,7 @@ module es {
             if (result) {
                 result.value = new CollisionResult();
                 result.value.normal = point.sub(this.center).normalize();
-                result.value.minimumTranslationVector = result.value.normal.scale(
-                    this.radius - point.sub(this.center).getLength()
-                );
+                result.value.minimumTranslationVector = result.value.normal.scale(this.radius - point.sub(this.center).getLength());
                 result.value.point = point;
             }
 
@@ -191,19 +204,20 @@ module es {
             return points;
         }
 
-        
-        private calculateProperties() {
+        public calculateProperties() {
             this.numberOfPoints = Math.max(10, Math.floor(this.radius * 0.1));
-            this.angleStep = (this.endAngle - this.startAngle) / (this.numberOfPoints - 1);
-            this.centerLine = Vector2.fromAngle((this.endAngle + this.startAngle) / 2, this.radius);
+            this.angleStep = this.angle / (this.numberOfPoints - 1);
+            this.centerLine = Vector2.fromAngle(this.angle);
         }
 
         public getFurthestPoint(normal: Vector2): Vector2 {
             let maxProjection = -Number.MAX_VALUE; // 最大投影值
             let furthestPoint = new Vector2(); // 最远点
-            for (let i = 0; i < this.numberOfPoints; i++) { // 遍历多边形的所有顶点
+            for (let i = 0; i < this.numberOfPoints; i++) {
+                // 遍历多边形的所有顶点
                 let projection = this.points[i].dot(normal); // 计算当前顶点到法线的投影
-                if (projection > maxProjection) { // 如果当前投影值大于最大投影值，则更新最大投影值和最远点
+                if (projection > maxProjection) {
+                    // 如果当前投影值大于最大投影值，则更新最大投影值和最远点
                     maxProjection = projection;
                     furthestPoint.copyFrom(this.points[i]);
                 }
