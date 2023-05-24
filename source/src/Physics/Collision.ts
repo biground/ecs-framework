@@ -102,7 +102,7 @@ module es {
             }
 
             if ((sector & PointSectors.bottom) !== 0) {
-                edgeFrom = new Vector2(rect.x, rect.y + rect.width);
+                edgeFrom = new Vector2(rect.x, rect.y + rect.height);
                 edgeTo = new Vector2(rect.x + rect.width, rect.y + rect.height);
                 if (this.circleToLine(cPosition, cRadius, edgeFrom, edgeTo))
                     return true;
