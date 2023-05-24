@@ -75,7 +75,7 @@ module es {
             // 获取碰撞器所在的网格坐标
             const p1 = this.cellCoords(bounds.x, bounds.y);
             const p2 = this.cellCoords(bounds.right, bounds.bottom);
-
+            let temp;
             // 从所有单元格中移除该碰撞器
             for (let x = p1.x; x <= p2.x; x++) {
                 for (let y = p1.y; y <= p2.y; y++) {
@@ -85,7 +85,12 @@ module es {
                         // 调用 indexOf 方法，查找元素在列表中的索引值
                         const index = cell.indexOf(collider);
                         // 如果元素存在，则调用 removeAt 方法将其从列表中删除，并返回 true，否则返回 false
-                        index !== -1 && cell.splice(index, 1);
+                        if (index !== -1) {
+                            temp = cell[cell.length - 1];
+                            cell[cell.length - 1] = cell[index]
+                            cell[index] = temp;
+                            cell.length -= 1;
+                        }
                     }
                 }
             }
@@ -361,7 +366,7 @@ module es {
      */
     export class NumberDictionary<T> {
         // 存储数据的 Map 对象
-        public _store: Map<string, T[]> = new Map<string, T[]>();
+        public _store: Map<number, T[]> = new Map<number, T[]>();
 
         /**
          * 将指定的列表添加到以给定 x 和 y 为键的字典条目中
@@ -402,7 +407,7 @@ module es {
          * @returns 唯一的字符串键
          */
         public getKey(x: number, y: number) {
-            return x + '_' + y;
+            return x * 100000 + y;
         }
 
         /**
