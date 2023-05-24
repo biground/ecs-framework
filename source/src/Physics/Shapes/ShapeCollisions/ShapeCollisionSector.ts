@@ -63,7 +63,7 @@ module es {
             }
             const px = d.dot(centerLine);
             const py = Math.abs(d.dot(Vector2Ext.perpendicularFlip(centerLine)));
-            if (px > Math.sqrt(dSqrtMagnitude) * Math.cos(angle)) {
+            if (Math.abs(px) > Math.abs(Math.sqrt(dSqrtMagnitude) * Math.cos(angle))) {
                 return true;
             }
             const q = Vector2.fromAngle(angle).scale(length);
