@@ -5,7 +5,12 @@ module es {
     export class Sector extends Shape {
         public center: Vector2;
         public radius: number;
-        public angle: number;
+        /** 扇形扫过的角度 */
+        public angleDegree: number;
+        /** 扇形扫过的弧度半角 */
+        public halfAngle: number;
+        /** 弧度，x轴到中线的顺时针旋转弧度 */
+        public fromXAngle: number;
         public radiusSquared: number;
         public numberOfPoints: number;
         public angleStep: number;
@@ -41,7 +46,8 @@ module es {
             this.radius = radius;
             this.m_startAngle = startAngle;
             this.m_endAngle = endAngle;
-            this.angle = endAngle - startAngle;
+            this.angleDegree = Math.abs(endAngle - startAngle);
+            this.halfAngle = MathHelper.toRadians(this.angleDegree / 2);
             this.radiusSquared = radius * radius;
             this.points = this.getPoints();
             this.calculateProperties();
@@ -162,14 +168,14 @@ module es {
 
             const angle = toPoint.getAngle(); // 点到圆心的向量与 x 轴正方向的夹角
             const startAngle = this.startAngle; // 圆弧起始角度
-            const endAngle = startAngle + this.angle; // 圆弧终止角度
+            const endAngle = startAngle + this.angleDegree; // 圆弧终止角度
 
             let angleDiff = angle - startAngle; // 计算点到圆弧起始角度的角度差
             if (angleDiff < 0) {
                 // 如果角度差小于 0，则说明点在圆弧角度的另一侧，需要加上 2 * PI
                 angleDiff += Math.PI * 2;
             }
-            if (angleDiff > this.angle) {
+            if (angleDiff > this.angleDegree) {
                 // 如果角度差大于圆弧角度，则该点不在圆弧范围内
                 return false;
             }
@@ -206,8 +212,9 @@ module es {
 
         public calculateProperties() {
             this.numberOfPoints = Math.max(10, Math.floor(this.radius * 0.1));
-            this.angleStep = this.angle / (this.numberOfPoints - 1);
-            this.centerLine = Vector2.fromAngle(this.angle);
+            this.angleStep = this.angleDegree / (this.numberOfPoints - 1);
+            this.fromXAngle = MathHelper.toRadians(this.m_startAngle + this.angleDegree / 2);
+            this.centerLine = Vector2.fromAngle(this.fromXAngle);
         }
 
         public getFurthestPoint(normal: Vector2): Vector2 {

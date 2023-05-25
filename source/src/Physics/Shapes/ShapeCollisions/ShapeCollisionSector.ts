@@ -52,9 +52,8 @@ module es {
         }
 
         public static sectorToCircle2(first: Sector, second: Circle): boolean {
-            let { center, centerLine, angle, radius: length } = first;
-            angle = angle / 2;
-            const { position, radius } = second;
+            let { center, centerLine, fromXAngle, halfAngle, radius: length } = first;
+            let { position, radius } = second;
             const d = position.sub(center);
             const dSqrtMagnitude = d.lengthSquared();
             const rSum = length + radius;
@@ -63,10 +62,10 @@ module es {
             }
             const px = d.dot(centerLine);
             const py = Math.abs(d.dot(Vector2Ext.perpendicularFlip(centerLine)));
-            if (Math.abs(px) > Math.abs(Math.sqrt(dSqrtMagnitude) * Math.cos(angle))) {
+            if (px > Math.sqrt(dSqrtMagnitude) * Math.cos(halfAngle)) {
                 return true;
             }
-            const q = Vector2.fromAngle(angle).scale(length);
+            const q = Vector2.fromAngle(halfAngle).scale(length);
             const p = new Vector2(px, py);
 
             const t = p.dot(q) / q.lengthSquared();

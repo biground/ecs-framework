@@ -93,8 +93,7 @@ module es {
          * @param max
          */
         public static clamp(value1: Vector2, min: Vector2, max: Vector2) {
-            return new Vector2(MathHelper.clamp(value1.x, min.x, max.x),
-                MathHelper.clamp(value1.y, min.y, max.y));
+            return new Vector2(MathHelper.clamp(value1.x, min.x, max.x), MathHelper.clamp(value1.y, min.y, max.y));
         }
 
         /**
@@ -110,14 +109,13 @@ module es {
 
         /**
          * 创建一个新的Vector2，其中包含指定矢量的线性插值
-         * @param value1 
-         * @param value2 
-         * @param amount 
-         * @returns 
+         * @param value1
+         * @param value2
+         * @param amount
+         * @returns
          */
         public static lerpPrecise(value1: Vector2, value2: Vector2, amount: number) {
-            return new Vector2(MathHelper.lerpPrecise(value1.x, value2.x, amount),
-                MathHelper.lerpPrecise(value1.y, value2.y, amount));
+            return new Vector2(MathHelper.lerpPrecise(value1.x, value2.x, amount), MathHelper.lerpPrecise(value1.y, value2.y, amount));
         }
 
         /**
@@ -126,18 +124,16 @@ module es {
          * @param matrix
          */
         public static transform(position: Vector2, matrix: Matrix2D) {
-            return new Vector2((position.x * matrix.m11) + (position.y * matrix.m21) + matrix.m31,
-                (position.x * matrix.m12) + (position.y * matrix.m22) + matrix.m32);
+            return new Vector2(position.x * matrix.m11 + position.y * matrix.m21 + matrix.m31, position.x * matrix.m12 + position.y * matrix.m22 + matrix.m32);
         }
 
         /**
          * 创建一个新的Vector2，其中包含由指定的Matrix转换的指定法线
-         * @param normal 
-         * @param matrix 
+         * @param normal
+         * @param matrix
          */
         public static transformNormal(normal: Vector2, matrix: Matrix) {
-            return new Vector2((normal.x * matrix.m11) + (normal.y * matrix.m21),
-                (normal.x * matrix.m12) + (normal.y * matrix.m22));
+            return new Vector2(normal.x * matrix.m11 + normal.y * matrix.m21, normal.x * matrix.m12 + normal.y * matrix.m22);
         }
 
         /**
@@ -175,30 +171,29 @@ module es {
 
         /**
          * 向量的反射，输入为两个二维向量vector和normal。函数返回一个新的向量，即vector相对于normal的反射
-         * @param vector 
-         * @param normal 
-         * @returns 
+         * @param vector
+         * @param normal
+         * @returns
          */
         public static reflect(vector: Vector2, normal: Vector2) {
             let result: Vector2 = es.Vector2.zero;
             // 计算向量与法线的点积，并将结果乘2
-            let val = 2 * ((vector.x * normal.x) + (vector.y * normal.y));
+            let val = 2 * (vector.x * normal.x + vector.y * normal.y);
             // 计算反射向量
-            result.x = vector.x - (normal.x * val);
-            result.y = vector.y - (normal.y * val);
+            result.x = vector.x - normal.x * val;
+            result.y = vector.y - normal.y * val;
             return result;
         }
 
         /**
          * 创建一个新的Vector2，其中包含指定矢量的三次插值
-         * @param value1 
-         * @param value2 
-         * @param amount 
-         * @returns 
+         * @param value1
+         * @param value2
+         * @param amount
+         * @returns
          */
         public static smoothStep(value1: Vector2, value2: Vector2, amount: number) {
-            return new Vector2(MathHelper.smoothStep(value1.x, value2.x, amount),
-                MathHelper.smoothStep(value1.y, value2.y, amount));
+            return new Vector2(MathHelper.smoothStep(value1.x, value2.x, amount), MathHelper.smoothStep(value1.y, value2.y, amount));
         }
 
         public setTo(x: number, y: number) {
@@ -245,9 +240,9 @@ module es {
         }
 
         /**
-         * 
-         * @param value 
-         * @returns 
+         *
+         * @param value
+         * @returns
          */
         public multiplyScaler(value: number): Vector2 {
             this.x *= value;
@@ -275,14 +270,14 @@ module es {
         }
 
         /**
-         * 
-         * @param size 
-         * @returns 
+         *
+         * @param size
+         * @returns
          */
         public scale(size: number): Vector2 {
             return new Vector2(this.x * size, this.y * size);
         }
-        
+
         /** 缩放时Y轴不会被翻转 */
         public scaleSignX(size: number): Vector2 {
             return new Vector2(this.x * size, this.y * Math.abs(size));
@@ -295,11 +290,8 @@ module es {
         }
 
         public transform(matrix: Matrix2D): Vector2 {
-            return new Vector2(
-              this.x * matrix.m11 + this.y * matrix.m21 + matrix.m31,
-              this.x * matrix.m12 + this.y * matrix.m22 + matrix.m32
-            );
-          }
+            return new Vector2(this.x * matrix.m11 + this.y * matrix.m21 + matrix.m31, this.x * matrix.m12 + this.y * matrix.m22 + matrix.m32);
+        }
 
         public normalize(): Vector2 {
             const d = this.distance();
@@ -310,7 +302,7 @@ module es {
             }
         }
 
-        /** 
+        /**
          * 将这个Vector2变成一个方向相同的单位向量
          */
         public normalizeEqual(): Vector2 {
@@ -341,18 +333,18 @@ module es {
          * @returns 这个Vector2的平方长度
          */
         public lengthSquared(): number {
-            return (this.x * this.x) + (this.y * this.y);
+            return this.x * this.x + this.y * this.y;
         }
 
         /**
          * 从原点到向量末端的距离
-         * @returns 
+         * @returns
          */
         public getLength(): number {
             return Math.sqrt(this.x * this.x + this.y * this.y);
         }
 
-        /** 
+        /**
          * 四舍五入X和Y值
          */
         public round(): Vector2 {
@@ -361,8 +353,8 @@ module es {
 
         /**
          * 返回以自己为中心点的左右角，单位为度
-         * @param left 
-         * @param right 
+         * @param left
+         * @param right
          */
         public angleBetween(left: Vector2, right: Vector2) {
             let one = left.sub(this);
@@ -387,8 +379,8 @@ module es {
 
         /**
          * 两个向量的叉积
-         * @param other 
-         * @returns 
+         * @param other
+         * @returns
          */
         public cross(other: Vector2): number {
             return this.x * other.y - this.y * other.x;
@@ -404,7 +396,7 @@ module es {
         /**
          * 比较当前实例是否等于指定的对象
          * @param other 要比较的对象
-         * @returns 如果实例相同true 否则false 
+         * @returns 如果实例相同true 否则false
          */
         public equals(other: Vector2, tolerance: number = 0.001): boolean {
             return Math.abs(this.x - other.x) <= tolerance && Math.abs(this.y - other.y) <= tolerance;
@@ -414,54 +406,52 @@ module es {
             return MathHelper.isValid(this.x) && MathHelper.isValid(this.y);
         }
 
+        public toFirstQuadrant():  Vector2 {
+            return new Vector2(Math.abs(this.x), Math.abs(this.y));
+        }
         /**
          * 创建一个新的Vector2，其中包含来自两个向量的最小值
-         * @param value1 
-         * @param value2 
-         * @returns 
+         * @param value1
+         * @param value2
+         * @returns
          */
         public static min(value1: Vector2, value2: Vector2) {
-            return new Vector2(value1.x < value2.x ? value1.x : value2.x,
-                value1.y < value2.y ? value1.y : value2.y);
+            return new Vector2(value1.x < value2.x ? value1.x : value2.x, value1.y < value2.y ? value1.y : value2.y);
         }
 
         /**
          * 创建一个新的Vector2，其中包含两个向量的最大值
-         * @param value1 
-         * @param value2 
-         * @returns 
+         * @param value1
+         * @param value2
+         * @returns
          */
         public static max(value1: Vector2, value2: Vector2) {
-            return new Vector2(value1.x > value2.x ? value1.x : value2.x,
-                value1.y > value2.y ? value1.y : value2.y);
+            return new Vector2(value1.x > value2.x ? value1.x : value2.x, value1.y > value2.y ? value1.y : value2.y);
         }
 
         /**
          * 创建一个新的Vector2，其中包含Hermite样条插值
-         * @param value1 
-         * @param tangent1 
-         * @param value2 
-         * @param tangent2 
-         * @param amount 
-         * @returns 
+         * @param value1
+         * @param tangent1
+         * @param value2
+         * @param tangent2
+         * @param amount
+         * @returns
          */
         public static hermite(value1: Vector2, tangent1: Vector2, value2: Vector2, tangent2: Vector2, amount: number) {
-            return new Vector2(MathHelper.hermite(value1.x, tangent1.x, value2.x, tangent2.x, amount),
-                MathHelper.hermite(value1.y, tangent1.y, value2.y, tangent2.y, amount));
+            return new Vector2(MathHelper.hermite(value1.x, tangent1.x, value2.x, tangent2.x, amount), MathHelper.hermite(value1.y, tangent1.y, value2.y, tangent2.y, amount));
         }
 
         public static unsignedAngle(from: Vector2, to: Vector2, round: boolean = true) {
             from.normalizeEqual();
             to.normalizeEqual();
-            const angle =
-                Math.acos(MathHelper.clamp(from.dot(to), -1, 1)) * MathHelper.Rad2Deg;
+            const angle = Math.acos(MathHelper.clamp(from.dot(to), -1, 1)) * MathHelper.Rad2Deg;
             return round ? Math.round(angle) : angle;
         }
 
         public static fromAngle(angle: number, magnitude: number = 1): Vector2 {
             return new Vector2(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
         }
-
 
         public clone(): Vector2 {
             return new Vector2(this.x, this.y);
