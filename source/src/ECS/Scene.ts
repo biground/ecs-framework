@@ -206,6 +206,13 @@ module es {
             return this.entities.findEntity(name);
         }
         /**
+         * 搜索并返回所有具有名称的实体
+         * @param name
+         */
+        public findEntities(name: string): Entity[] {
+            return this.entities.findEntities(name);
+        }
+        /**
          * 返回最后一个找到的名字为name的实体。如果没有找到则返回null
          * @param name
          * @param isEnable 是否只查找enable为true的组件

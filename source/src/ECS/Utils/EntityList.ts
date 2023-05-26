@@ -81,7 +81,7 @@ module es {
         public remove(entity: Entity) {
             // 如果实体在添加列表中，则将其从添加列表中移除
             if (this._entitiesToAdded[entity.id]) {
-                const index = this._entitiesToAddedList.findIndex((e) => e.id === entity.id);
+                const index = this._entitiesToAddedList.findIndex(e => e.id === entity.id);
                 if (index !== -1) {
                     this._entitiesToAddedList.splice(index, 1);
                 }
@@ -209,7 +209,7 @@ module es {
          * @param entity 实体
          */
         public addToBTagList(entity: Entity, tag?) {
-            Flags.doActionInFlags(new Ref(tag || entity.BTag), (value) => {
+            Flags.doActionInFlags(new Ref(tag || entity.BTag), value => {
                 // 获取标签列表
                 const list = this.getTagList(value);
 
@@ -218,7 +218,7 @@ module es {
 
                 // 添加未排序标志
                 this._unsortedTags.add(value);
-            })
+            });
         }
 
         /**
@@ -226,7 +226,7 @@ module es {
          * @param entity 实体
          */
         public removeFromBTagList(entity: Entity) {
-            Flags.doActionInFlags(new Ref(entity.BTag), (value) => {
+            Flags.doActionInFlags(new Ref(entity.BTag), value => {
                 // 获取实体的标签列表
                 const list = this._entityDict.get(value);
 
@@ -234,7 +234,7 @@ module es {
                 if (list) {
                     list.delete(entity);
                 }
-            })
+            });
         }
 
         /**
@@ -250,7 +250,6 @@ module es {
             }
         }
 
-
         /**
          * 更新场景中实体的列表。
          */
@@ -262,7 +261,7 @@ module es {
                     this.removeFromTagList(entity);
 
                     // 从场景实体列表中删除实体
-                    const index = this._entities.findIndex((e) => e.id === entity.id);
+                    const index = this._entities.findIndex(e => e.id === entity.id);
                     if (index !== -1) {
                         this._entities.splice(index, 1);
                     }
@@ -287,7 +286,7 @@ module es {
                     this._entities.push(entity);
                     entity.scene = this.scene;
                     if (entity.BTag) {
-                        this.addToBTagList(entity)
+                        this.addToBTagList(entity);
                     } else {
                         this.addToTagList(entity);
                     }
@@ -309,7 +308,6 @@ module es {
             }
         }
 
-
         /**
          * 返回第一个找到的名字为name的实体。如果没有找到则返回null
          * @param name
@@ -318,20 +316,41 @@ module es {
             if (this._entities.length > 0) {
                 for (let i = 0, s = this._entities.length; i < s; ++i) {
                     let entity = this._entities[i];
-                    if (entity.name == name)
-                        return entity;
+                    if (entity.name == name) return entity;
                 }
             }
 
             if (this._entitiesToAddedList.length > 0) {
                 for (let i = 0, s = this._entitiesToAddedList.length; i < s; ++i) {
                     let entity = this._entitiesToAddedList[i];
-                    if (entity.name == name)
-                        return entity;
+                    if (entity.name == name) return entity;
                 }
             }
 
             return null;
+        }
+
+        /**
+         * 返回第一个找到的名字为name的实体。如果没有找到则返回null
+         * @param name
+         */
+        public findEntities(name: string) {
+            const result = [];
+            if (this._entities.length > 0) {
+                for (let i = 0, s = this._entities.length; i < s; ++i) {
+                    let entity = this._entities[i];
+                    if (entity.name == name) result.push(entity);
+                }
+            }
+
+            if (this._entitiesToAddedList.length > 0) {
+                for (let i = 0, s = this._entitiesToAddedList.length; i < s; ++i) {
+                    let entity = this._entitiesToAddedList[i];
+                    if (entity.name == name) result.push(entity);
+                }
+            }
+
+            return result;
         }
         /**
          * 返回最后一个找到的名字为name的实体。如果没有找到则返回null
@@ -341,16 +360,14 @@ module es {
             if (this._entities.length > 0) {
                 for (let i = this._entities.length - 1, s = 0; i >= s; --i) {
                     let entity = this._entities[i];
-                    if (entity.name == name && (!isEnable || entity.enabled))
-                        return entity;
+                    if (entity.name == name && (!isEnable || entity.enabled)) return entity;
                 }
             }
 
             if (this._entitiesToAddedList.length > 0) {
                 for (let i = this._entitiesToAddedList.length - 1, s = 0; i >= s; --i) {
                     let entity = this._entitiesToAddedList[i];
-                    if (entity.name == name)
-                        return entity;
+                    if (entity.name == name) return entity;
                 }
             }
 
@@ -368,8 +385,7 @@ module es {
                 for (let i = 0, s = this._entities.length; i < s; ++i) {
                     let entity = this._entities[i];
                     // 如果实体的ID匹配，返回该实体
-                    if (entity.id == id)
-                        return entity;
+                    if (entity.id == id) return entity;
                 }
             }
 
@@ -447,7 +463,6 @@ module es {
             return null;
         }
 
-
         /**
          * 在场景中查找具有给定类型的所有组件。
          * @param type 要查找的组件类型。
@@ -474,7 +489,6 @@ module es {
             // 返回具有给定类型的所有组件的列表
             return comps;
         }
-
 
         /**
          * 返回拥有指定类型组件的所有实体
@@ -536,6 +550,5 @@ module es {
 
             return entities;
         }
-
     }
 }
