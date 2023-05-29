@@ -89,7 +89,7 @@ module es {
                             temp = cell[cell.length - 1];
                             cell[cell.length - 1] = cell[index]
                             cell[index] = temp;
-                            cell.length -= 1;
+                            cell.pop();
                         }
                     }
                 }

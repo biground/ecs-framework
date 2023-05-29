@@ -4,7 +4,7 @@ module es {
      */
     export class Sector extends Shape {
         public center: Vector2;
-        public radius: number;
+        public m_radius: number;
         /** 扇形扫过的角度 */
         public angleDegree: number;
         /** 扇形扫过的弧度半角 */
@@ -23,6 +23,8 @@ module es {
         }
         set startAngle(startAngle: number) {
             this.m_startAngle = startAngle;
+            this.angleDegree = Math.abs(this.m_endAngle - startAngle);
+            this.halfAngle = MathHelper.toRadians(this.angleDegree / 2);
             this.calculateProperties();
         }
         private m_endAngle: number;
@@ -31,6 +33,8 @@ module es {
         }
         set endAngle(endAngle: number) {
             this.m_endAngle = endAngle;
+            this.angleDegree = Math.abs(endAngle - this.m_startAngle);
+            this.halfAngle = MathHelper.toRadians(this.angleDegree / 2);
             this.calculateProperties();
         }
 
@@ -48,9 +52,15 @@ module es {
             this.m_endAngle = endAngle;
             this.angleDegree = Math.abs(endAngle - startAngle);
             this.halfAngle = MathHelper.toRadians(this.angleDegree / 2);
-            this.radiusSquared = radius * radius;
             this.points = this.getPoints();
             this.calculateProperties();
+        }
+        get radius() {
+            return this.m_radius
+        }
+        set radius(r) {
+            this.m_radius = r;
+            this.radiusSquared = r * r;
         }
 
         /**
@@ -59,8 +69,8 @@ module es {
          */
         public getCentroid(): Vector2 {
             // 计算圆弧的质心坐标
-            const x = ((Math.cos(this.startAngle) + Math.cos(this.endAngle)) * this.radius) / 3;
-            const y = ((Math.sin(this.startAngle) + Math.sin(this.endAngle)) * this.radius) / 3;
+            const x = ((Math.cos(this.startAngle) + Math.cos(this.endAngle)) * this.m_radius) / 3;
+            const y = ((Math.sin(this.startAngle) + Math.sin(this.endAngle)) * this.m_radius) / 3;
             // 返回质心坐标
             return new Vector2(x + this.center.x, y + this.center.y);
         }
@@ -75,10 +85,10 @@ module es {
 
         public recalculateBounds(collider: Collider): void {
             const localCenter = this.center.add(collider.localOffset);
-            const x = localCenter.x - this.radius;
-            const y = localCenter.y - this.radius;
-            const width = this.radius * 2;
-            const height = this.radius * 2;
+            const x = localCenter.x - this.m_radius;
+            const y = localCenter.y - this.m_radius;
+            const height = this.m_radius * 2;
+            const width = this.m_radius * 2;
             const bounds = new Rectangle(x, y, width, height);
             this.bounds = bounds;
 
@@ -194,7 +204,7 @@ module es {
             if (result) {
                 result.value = new CollisionResult();
                 result.value.normal = point.sub(this.center).normalize();
-                result.value.minimumTranslationVector = result.value.normal.scale(this.radius - point.sub(this.center).getLength());
+                result.value.minimumTranslationVector = result.value.normal.scale(this.m_radius - point.sub(this.center).getLength());
                 result.value.point = point;
             }
 
@@ -205,13 +215,13 @@ module es {
             let points = new Array<Vector2>(this.numberOfPoints);
             for (let i = 0; i < this.numberOfPoints; i++) {
                 let angle = this.startAngle + i * this.angleStep;
-                points[i] = Vector2.fromAngle(angle, this.radius).add(this.center);
+                points[i] = Vector2.fromAngle(angle, this.m_radius).add(this.center);
             }
             return points;
         }
 
         public calculateProperties() {
-            this.numberOfPoints = Math.max(10, Math.floor(this.radius * 0.1));
+            this.numberOfPoints = Math.max(10, Math.floor(this.m_radius * 0.1));
             this.angleStep = this.angleDegree / (this.numberOfPoints - 1);
             this.fromXAngle = MathHelper.toRadians(this.m_startAngle + this.angleDegree / 2);
             this.centerLine = Vector2.fromAngle(this.fromXAngle);

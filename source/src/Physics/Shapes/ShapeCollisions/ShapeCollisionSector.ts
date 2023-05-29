@@ -52,7 +52,7 @@ module es {
         }
 
         public static sectorToCircle2(first: Sector, second: Circle): boolean {
-            let { center, centerLine, fromXAngle, halfAngle, radius: length } = first;
+            let { center, centerLine, fromXAngle, halfAngle, m_radius: length } = first;
             let { position, radius } = second;
             const d = position.sub(center);
             const dSqrtMagnitude = d.lengthSquared();
