@@ -357,17 +357,17 @@ module es {
          * @param name
          */
         public findEntityRight(name: string, isEnable: boolean = true) {
-            if (this._entities.length > 0) {
-                for (let i = this._entities.length - 1, s = 0; i >= s; --i) {
-                    let entity = this._entities[i];
-                    if (entity.name == name && (!isEnable || entity.enabled)) return entity;
-                }
-            }
 
             if (this._entitiesToAddedList.length > 0) {
                 for (let i = this._entitiesToAddedList.length - 1, s = 0; i >= s; --i) {
                     let entity = this._entitiesToAddedList[i];
                     if (entity.name == name) return entity;
+                }
+            }
+            if (this._entities.length > 0) {
+                for (let i = this._entities.length - 1, s = 0; i >= s; --i) {
+                    let entity = this._entities[i];
+                    if (entity.name == name && (!isEnable || entity.enabled)) return entity;
                 }
             }
 
