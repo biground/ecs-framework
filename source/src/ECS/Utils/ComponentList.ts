@@ -4,8 +4,7 @@ module es {
         /**
          * 比较IUpdatable对象的更新顺序。
          */
-        public static compareUpdatableOrder: IUpdatableComparer =
-            new IUpdatableComparer();
+        public static compareUpdatableOrder: IUpdatableComparer = new IUpdatableComparer();
         public _entity: Entity;
         /**
          * 实体的组件列表。
@@ -50,18 +49,12 @@ module es {
         /**
          * 按组件类型组织的组件列表字典。
          */
-        private componentsByType = new Map<
-            new (...args: any[]) => Component,
-            es.Component[]
-        >();
+        private componentsByType = new Map<new (...args: any[]) => Component, es.Component[]>();
 
         /**
          * 按组件类型组织的等待添加到实体的组件列表字典。
          */
-        private componentsToAddByType = new Map<
-            new (...args: any[]) => Component,
-            es.Component[]
-        >();
+        private componentsToAddByType = new Map<new (...args: any[]) => Component, es.Component[]>();
 
         constructor(entity: Entity) {
             this._entity = entity;
@@ -97,9 +90,7 @@ module es {
         public remove(component: Component) {
             // 如果组件在_componentsToAdd中，则将其从_componentsToAddList中移除，并从相应的组件类型字典中移除组件
             if (this._componentsToAdd[component.id]) {
-                const index = this._componentsToAddList.findIndex(
-                    c => c.id === component.id,
-                );
+                const index = this._componentsToAddList.findIndex(c => c.id === component.id);
                 if (index !== -1) {
                     this._componentsToAddList.splice(index, 1);
                 }
@@ -142,16 +133,12 @@ module es {
                     // 处理IUpdatable
                     if (isIUpdatable(component)) {
                         // 创建一个新的List实例，从_updatableComponents中移除组件，以避免并发修改异常
-                        new es.List(this._updatableComponents).remove(
-                            component,
-                        );
+                        new es.List(this._updatableComponents).remove(component);
                     }
 
                     // 从位掩码中减去组件类型的索引，通知实体处理器一个组件已被移除
                     this.decreaseBits(component);
-                    this._entity.scene.entityProcessors.onComponentRemoved(
-                        this._entity,
-                    );
+                    this._entity.scene.entityProcessors.onComponentRemoved(this._entity);
                 }
             }
         }
@@ -169,9 +156,7 @@ module es {
 
                     // 将组件类型的索引添加到实体的位掩码中，通知实体处理器一个组件已被添加
                     this.addBits(component);
-                    this._entity.scene.entityProcessors.onComponentAdded(
-                        this._entity,
-                    );
+                    this._entity.scene.entityProcessors.onComponentAdded(this._entity);
                 }
             }
         }
@@ -184,9 +169,7 @@ module es {
             const bits = this._entity.componentBits;
 
             // 获取组件类型的索引，将其对应位掩码减1
-            const typeIndex = ComponentTypeManager.getIndexFor(
-                TypeUtils.getType(component),
-            );
+            const typeIndex = ComponentTypeManager.getIndexFor(TypeUtils.getType(component));
             bits.set(typeIndex, bits.get(typeIndex) - 1);
         }
 
@@ -198,9 +181,7 @@ module es {
             const bits = this._entity.componentBits;
 
             // 获取组件类型的索引，将其对应位掩码加1
-            const typeIndex = ComponentTypeManager.getIndexFor(
-                TypeUtils.getType(component),
-            );
+            const typeIndex = ComponentTypeManager.getIndexFor(TypeUtils.getType(component));
             bits.set(typeIndex, bits.get(typeIndex) + 1);
         }
 
@@ -216,9 +197,7 @@ module es {
                     this.handleRemove(component);
 
                     // 从_components数组中删除组件
-                    const index = this._components.findIndex(
-                        c => c.id === component.id,
-                    );
+                    const index = this._components.findIndex(c => c.id === component.id);
                     if (index !== -1) {
                         this._components.splice(index, 1);
                     }
@@ -242,9 +221,7 @@ module es {
 
                     // 更新实体的组件位掩码，通知实体处理器一个组件已经添加
                     this.addBits(component);
-                    this._entity.scene.entityProcessors.onComponentAdded(
-                        this._entity,
-                    );
+                    this._entity.scene.entityProcessors.onComponentAdded(this._entity);
 
                     // 将组件添加到相应类型的fastList中，将组件添加到_components数组中
                     this.addComponentsByType(component);
@@ -279,13 +256,8 @@ module es {
 
         public handleRemove(component: Component) {
             // 如果组件可以更新，从可更新组件列表中删除该组件
-            if (
-                isIUpdatable(component) &&
-                this._updatableComponents.length > 0
-            ) {
-                const index = this._updatableComponents.findIndex(
-                    c => ((<any>c) as Component).id === component.id,
-                );
+            if (isIUpdatable(component) && this._updatableComponents.length > 0) {
+                const index = this._updatableComponents.findIndex(c => ((<any>c) as Component).id === component.id);
                 if (index !== -1) {
                     this._updatableComponents.splice(index, 1);
                 }
@@ -295,9 +267,7 @@ module es {
             this.decreaseBits(component);
 
             // 通知实体处理器一个组件已被删除
-            this._entity.scene.entityProcessors.onComponentRemoved(
-                this._entity,
-            );
+            this._entity.scene.entityProcessors.onComponentRemoved(this._entity);
 
             // 调用组件的onRemovedFromEntity方法，将其entity属性设置为null
             component.onRemovedFromEntity();
@@ -306,9 +276,7 @@ module es {
 
         private removeComponentsByType(component: Component) {
             // 获取存储指定类型组件的fastList数组
-            const fastList = this.componentsByType.get(
-                TypeUtils.getType(component),
-            );
+            const fastList = this.componentsByType.get(TypeUtils.getType(component));
 
             // 在fastList中查找要删除的组件
             const index = fastList.findIndex(c => c.id === component.id);
@@ -320,9 +288,7 @@ module es {
 
         private addComponentsByType(component: Component) {
             // 获取存储指定类型组件的fastList数组
-            let fastList = this.componentsByType.get(
-                TypeUtils.getType(component),
-            );
+            let fastList = this.componentsByType.get(TypeUtils.getType(component));
 
             // 如果fastList不存在，则创建一个空数组
             if (!fastList) {
@@ -342,9 +308,7 @@ module es {
          */
         private removeComponentsToAddByType(component: Component) {
             // 获取待添加组件列表中指定类型的组件列表
-            let fastList =
-                this.componentsToAddByType.get(TypeUtils.getType(component)) ||
-                [];
+            let fastList = this.componentsToAddByType.get(TypeUtils.getType(component)) || [];
 
             // 在该列表中查找指定组件
             let fastIndex = fastList.findIndex(c => c.id == component.id);
@@ -361,9 +325,7 @@ module es {
          */
         private addComponentsToAddByType(component: Component) {
             // 获取待添加组件列表中指定类型的组件列表
-            let fastList = this.componentsToAddByType.get(
-                TypeUtils.getType(component),
-            );
+            let fastList = this.componentsToAddByType.get(TypeUtils.getType(component));
 
             // 如果指定类型的组件列表不存在，则创建一个新的列表
             if (!fastList) fastList = [];
@@ -372,10 +334,7 @@ module es {
             fastList.push(component);
 
             // 更新待添加组件列表中指定类型的组件列表
-            this.componentsToAddByType.set(
-                TypeUtils.getType(component),
-                fastList,
-            );
+            this.componentsToAddByType.set(TypeUtils.getType(component), fastList);
         }
 
         /**
@@ -384,10 +343,7 @@ module es {
          * @param onlyReturnInitializedComponents 是否仅返回已初始化的组件
          * @returns 指定类型的第一个组件实例，如果不存在则返回 null
          */
-        public getComponent<T extends Component>(
-            type: new (...args: any[]) => T,
-            onlyReturnInitializedComponents: boolean,
-        ): T {
+        public getComponent<T extends Component>(type: new (...args: any[]) => T, onlyReturnInitializedComponents: boolean): T {
             // 获取指定类型的组件列表
             let fastList = this.componentsByType.get(type);
 
@@ -397,8 +353,7 @@ module es {
             // 如果不仅返回已初始化的组件，则检查待添加组件列表中是否存在指定类型的组件
             if (!onlyReturnInitializedComponents) {
                 let fastToAddList = this.componentsToAddByType.get(type);
-                if (fastToAddList && fastToAddList.length > 0)
-                    return fastToAddList[0] as T;
+                if (fastToAddList && fastToAddList.length > 0) return fastToAddList[0] as T;
             }
 
             // 如果指定类型的组件列表为空且待添加组件列表中也不存在该类型的组件，则返回 null
@@ -411,10 +366,7 @@ module es {
          * @param components 存储组件实例的数组
          * @returns 存储了指定类型的所有组件实例的数组
          */
-        public getComponents<T extends Component>(
-            typeName: new (...args: any[]) => T,
-            components?: T[],
-        ): T[] {
+        public getComponents<T extends Component>(typeName: new (...args: any[]) => T, components?: T[]): T[] {
             // 如果没有传入组件实例数组，则创建一个新数组
             if (!components) components = [];
 
@@ -433,13 +385,11 @@ module es {
         public update() {
             this.updateLists();
             if (this._updatableComponents.length > 0) {
-                for (
-                    let i = 0, s = this._updatableComponents.length;
-                    i < s;
-                    ++i
-                ) {
+                for (let i = 0, s = this._updatableComponents.length; i < s; ++i) {
                     let updateComponent = this._updatableComponents[i];
-                    if (updateComponent.enabled) updateComponent.update();
+                    if (updateComponent.enabled) {
+                        updateComponent.update();
+                    }
                 }
             }
         }
@@ -448,35 +398,27 @@ module es {
             if (this._components.length > 0) {
                 for (let i = 0, s = this._components.length; i < s; ++i) {
                     let component = this._components[i];
-                    if (component.enabled)
-                        component.onEntityTransformChanged(comp);
+                    if (component.enabled) component.onEntityTransformChanged(comp);
                 }
             }
 
             if (this._componentsToAddList.length > 0) {
-                for (
-                    let i = 0, s = this._componentsToAddList.length;
-                    i < s;
-                    ++i
-                ) {
+                for (let i = 0, s = this._componentsToAddList.length; i < s; ++i) {
                     let component = this._componentsToAddList[i];
-                    if (component.enabled)
-                        component.onEntityTransformChanged(comp);
+                    if (component.enabled) component.onEntityTransformChanged(comp);
                 }
             }
         }
 
         public onEntityEnabled() {
             if (this._components.length > 0) {
-                for (let i = 0, s = this._components.length; i < s; i++)
-                    this._components[i].onEnabled();
+                for (let i = 0, s = this._components.length; i < s; i++) this._components[i].onEnabled();
             }
         }
 
         public onEntityDisabled() {
             if (this._components.length > 0) {
-                for (let i = 0, s = this._components.length; i < s; i++)
-                    this._components[i].onDisabled();
+                for (let i = 0, s = this._components.length; i < s; i++) this._components[i].onDisabled();
             }
         }
     }

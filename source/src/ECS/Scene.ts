@@ -29,7 +29,7 @@ module es {
          * 这个方法会在场景创建时被调用。您可以在这个方法中添加实体和组件，
          * 或者执行一些必要的准备工作，以便场景能够开始运行。
          */
-        public initialize() { }
+        public initialize() {}
 
         /**
          * 开始运行场景时调用此方法，可以在派生类中覆盖
@@ -37,7 +37,7 @@ module es {
          * 这个方法会在场景开始运行时被调用。您可以在这个方法中执行场景开始时需要进行的操作。
          * 比如，您可以开始播放一段背景音乐、启动UI等等。
          */
-        public onStart() { }
+        public onStart() {}
 
         /**
          * 卸载场景时调用此方法，可以在派生类中覆盖
@@ -45,7 +45,7 @@ module es {
          * 这个方法会在场景被销毁时被调用。您可以在这个方法中销毁实体和组件、释放资源等等。
          * 您也可以在这个方法中执行一些必要的清理工作，以确保场景被完全卸载。
          */
-        public onUnload() { }
+        public onUnload() {}
 
         /**
          * 开始场景，初始化物理系统、启动实体处理器等
@@ -57,8 +57,7 @@ module es {
             Physics.reset();
 
             // 启动实体处理器
-            if (this.entityProcessors != null)
-                this.entityProcessors.begin();
+            if (this.entityProcessors != null) this.entityProcessors.begin();
 
             // 标记场景已开始运行并调用onStart方法
             this._didSceneBegin = true;
@@ -86,8 +85,7 @@ module es {
             Physics.clear();
 
             // 结束实体处理器
-            if (this.entityProcessors)
-                this.entityProcessors.end();
+            if (this.entityProcessors) this.entityProcessors.end();
 
             // 调用卸载方法
             this.onUnload();
@@ -102,20 +100,17 @@ module es {
 
             // 更新场景组件
             for (let i = this._sceneComponents.length - 1; i >= 0; i--) {
-                if (this._sceneComponents[i].enabled)
-                    this._sceneComponents[i].update();
+                if (this._sceneComponents[i].enabled) this._sceneComponents[i].update();
             }
 
             // 更新实体处理器
-            if (this.entityProcessors != null)
-                this.entityProcessors.update();
+            if (this.entityProcessors != null) this.entityProcessors.update();
 
             // 更新实体组
             this.entities.update();
 
             // 更新实体处理器的后处理方法
-            if (this.entityProcessors != null)
-                this.entityProcessors.lateUpdate();
+            if (this.entityProcessors != null) this.entityProcessors.lateUpdate();
         }
 
         /**
@@ -137,8 +132,7 @@ module es {
         public getSceneComponent<T extends SceneComponent>(type) {
             for (let i = 0; i < this._sceneComponents.length; i++) {
                 let component = this._sceneComponents[i];
-                if (component instanceof type)
-                    return component as T;
+                if (component instanceof type) return component as T;
             }
 
             return null;
@@ -150,8 +144,7 @@ module es {
          */
         public getOrCreateSceneComponent<T extends SceneComponent>(type) {
             let comp = this.getSceneComponent<T>(type);
-            if (comp == null)
-                comp = this.addSceneComponent<T>(new type());
+            if (comp == null) comp = this.addSceneComponent<T>(new type());
 
             return comp;
         }
@@ -183,8 +176,7 @@ module es {
             this.entities.add(entity);
             entity.scene = this;
 
-            for (let i = 0; i < entity.transform.childCount; i++)
-                this.addEntity(entity.transform.getChild(i).entity);
+            for (let i = 0; i < entity.transform.childCount; i++) this.addEntity(entity.transform.getChild(i).entity);
 
             return entity;
         }

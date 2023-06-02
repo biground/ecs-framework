@@ -45,8 +45,7 @@ module es {
          * box只有两个边缘 因为其他两边是平行的
          */
         public get edgeNormals() {
-            if (this._areEdgeNormalsDirty)
-                this.buildEdgeNormals();
+            if (this._areEdgeNormalsDirty) this.buildEdgeNormals();
             return this._edgeNormals;
         }
 
@@ -80,16 +79,13 @@ module es {
         public buildEdgeNormals() {
             // 对于box 我们只需要两条边，因为另外两条边是平行的
             let totalEdges = this.isBox ? 2 : this.points.length;
-            if (this._edgeNormals == undefined || this._edgeNormals.length != totalEdges)
-                this._edgeNormals = new Array(totalEdges);
+            if (this._edgeNormals == undefined || this._edgeNormals.length != totalEdges) this._edgeNormals = new Array(totalEdges);
 
             let p2: Vector2;
             for (let i = 0; i < totalEdges; i++) {
                 let p1 = this.points[i];
-                if (i + 1 >= this.points.length)
-                    p2 = this.points[0];
-                else
-                    p2 = this.points[i + 1];
+                if (i + 1 >= this.points.length) p2 = this.points[0];
+                else p2 = this.points[i + 1];
 
                 let perp = Vector2Ext.perpendicular(p1, p2);
                 Vector2Ext.normalize(perp);
@@ -119,8 +115,7 @@ module es {
          */
         public static recenterPolygonVerts(points: Vector2[]) {
             const center = this.findPolygonCenter(points);
-            for (let i = 0; i < points.length; i++)
-                points[i] = points[i].sub(center);
+            for (let i = 0; i < points.length; i++) points[i] = points[i].sub(center);
         }
 
         /**
@@ -128,7 +123,8 @@ module es {
          * @param points
          */
         public static findPolygonCenter(points: Vector2[]) {
-            let x = 0, y = 0;
+            let x = 0,
+                y = 0;
 
             for (let i = 0; i < points.length; i++) {
                 x += points[i].x;
@@ -167,10 +163,13 @@ module es {
          * @param distanceSquared
          * @param edgeNormal
          */
-        public static getClosestPointOnPolygonToPoint(points: Vector2[], point: Vector2): {
+        public static getClosestPointOnPolygonToPoint(
+            points: Vector2[],
+            point: Vector2,
+        ): {
             distanceSquared: number;
             edgeNormal: Vector2;
-            closestPoint: Vector2
+            closestPoint: Vector2;
         } {
             const res = {
                 distanceSquared: Number.MAX_VALUE,
@@ -181,8 +180,7 @@ module es {
             let tempDistanceSquared = 0;
             for (let i = 0; i < points.length; i++) {
                 let j = i + 1;
-                if (j === points.length)
-                    j = 0;
+                if (j === points.length) j = 0;
 
                 const closest = ShapeCollisionsCircle.closestPointOnLine(points[i], points[j], point);
                 tempDistanceSquared = Vector2.sqrDistance(point, closest);
@@ -261,8 +259,7 @@ module es {
 
         public overlaps(other: Shape) {
             let result = new Out<CollisionResult>();
-            if (other instanceof Polygon)
-                return ShapeCollisionsPolygon.polygonToPolygon(this, other, result);
+            if (other instanceof Polygon) return ShapeCollisionsPolygon.polygonToPolygon(this, other, result);
 
             if (other instanceof Circle) {
                 if (ShapeCollisionsCircle.circleToPolygon(other, this, result)) {
@@ -273,7 +270,9 @@ module es {
                 return false;
             }
 
-            throw new Error(`overlaps of Pologon to ${other} are not supported`);
+            console.error(`overlaps of Pologon to ${other} are not supported`);
+            console.error(other);
+            return false;
         }
 
         public collidesWithShape(other: Shape, result: Out<CollisionResult>): boolean {
@@ -290,7 +289,9 @@ module es {
                 return false;
             }
 
-            throw new Error(`overlaps of Polygon to ${other} are not supported`);
+            console.error(`overlaps of Pologon to ${other} are not supported`);
+            console.error(other);
+            return false;
         }
 
         public collidesWithLine(start: Vector2, end: Vector2, hit: Out<RaycastHit>): boolean {
@@ -308,9 +309,10 @@ module es {
 
             let isInside = false;
             for (let i = 0, j = this.points.length - 1; i < this.points.length; j = i++) {
-                if (((this.points[i].y > point.y) !== (this.points[j].y > point.y)) &&
-                    (point.x < (this.points[j].x - this.points[i].x) * (point.y - this.points[i].y) / (this.points[j].y - this.points[i].y) +
-                        this.points[i].x)) {
+                if (
+                    this.points[i].y > point.y !== this.points[j].y > point.y &&
+                    point.x < ((this.points[j].x - this.points[i].x) * (point.y - this.points[i].y)) / (this.points[j].y - this.points[i].y) + this.points[i].x
+                ) {
                     isInside = !isInside;
                 }
             }

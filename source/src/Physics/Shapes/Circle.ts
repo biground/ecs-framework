@@ -43,7 +43,9 @@ module es {
                 return ShapeCollisionsCircle.circleToPolygon(this, other, result);
             }
 
-            throw new Error(`overlaps of circle to ${other} are not supported`);
+            console.error(`overlaps of circle to ${other} are not supported`);
+            console.error(other);
+            return false;
         }
 
         public collidesWithShape(other: Shape, result: Out<CollisionResult>): boolean {

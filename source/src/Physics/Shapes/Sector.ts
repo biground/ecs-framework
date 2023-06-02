@@ -107,7 +107,9 @@ module es {
                 return false;
             }
 
-            throw new Error(`overlaps of Sector to ${other} are not supported`);
+            console.error(`overlaps of Sector to ${other} are not supported`);
+            console.error(other);
+            return false;
         }
 
         public collidesWithShape(other: Shape, collisionResult: Out<CollisionResult>): boolean {
@@ -123,7 +125,9 @@ module es {
                 return ShapeCollisionSector.sectorToCircle2(this, other);
             }
 
-            throw new Error(`overlaps of Polygon to ${other} are not supported`);
+            console.error(`overlaps of Pologon to ${other} are not supported`);
+            console.error(other);
+            return false;
         }
 
         public collidesWithLine(start: Vector2, end: Vector2, hit: Out<RaycastHit>): boolean {
