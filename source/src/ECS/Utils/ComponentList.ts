@@ -278,6 +278,11 @@ module es {
             // 获取存储指定类型组件的fastList数组
             const fastList = this.componentsByType.get(TypeUtils.getType(component));
 
+            if (!fastList) {
+                console.error(`尝试移除${this._entity.toString()}的${component?.constructor?.name}组件失败，组件已被移除`)
+                return;
+            }
+
             // 在fastList中查找要删除的组件
             const index = fastList.findIndex(c => c.id === component.id);
             if (index !== -1) {
