@@ -51,8 +51,24 @@ module es {
             return collision;
         }
 
+        /**
+         * 
+         * @param first 扇形区域
+         * @param second 圆形区域
+         * @returns 
+         */
         public static sectorToCircle2(first: Sector, second: Circle): boolean {
-            let { center, centerLine, fromXAngle, halfAngle, m_radius: length } = first;
+            /**
+             * @param center 扇形中心坐标
+             * @param centerLine 扇形中线单位向量
+             * @param halfAngle 扇形扫过半角
+             * @param m_radius 扇形边长
+             */
+            let { center, centerLine, halfAngle, m_radius: length } = first;
+            /**
+             * @param center 圆形中心坐标
+             * @param m_radius 圆形半径
+             */
             let { position, radius } = second;
             const d = position.sub(center);
             const dSqrtMagnitude = d.lengthSquared();

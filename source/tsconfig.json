@@ -29,5 +29,6 @@
     "src/ECS/Components/Physics/CharacterController.ts",
     "src/ECS/Components/Physics/Mover.ts",
     "src/ECS/Components/Physics/ProjectileMover.ts",
+    "src/Physics/ColliderTriggerHelper.ts",
   ]
 }

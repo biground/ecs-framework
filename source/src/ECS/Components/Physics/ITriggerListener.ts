@@ -11,14 +11,14 @@ module es {
          * @param other
          * @param local
          */
-        onTriggerEnter(other: Collider, local: Collider);
+        onTriggerEnter(other: Entity, local: Entity);
 
         /**
          * 当另一个碰撞器离开触发碰撞器时调用
          * @param other
          * @param local
          */
-        onTriggerExit(other: Collider, local: Collider);
+        onTriggerExit(other: Entity, local: Entity);
     }
 
     export class TriggerListenerHelper {

@@ -114,6 +114,12 @@ module es {
             return this._spatialHash.aabbBroadphase(sweptBounds, collider, layerMask);
         }
 
+        /** 返回所有边界和点相交的碰撞器 */
+        public static broadphasePoint(point: Vector2, layerMask = this.allLayers) {
+            const bounds = new Rectangle(point.x, point.y, 0, 0);
+            return this._spatialHash.aabbBroadphase(bounds, null, layerMask);
+        }
+
         /**
          * 将对撞机添加到物理系统中
          * @param collider

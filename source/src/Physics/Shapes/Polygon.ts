@@ -270,7 +270,7 @@ module es {
                 return false;
             }
 
-            console.error(`overlaps of Pologon to ${other} are not supported`);
+            console.error(`overlaps of Pologon to ${other.constructor.name} are not supported`);
             console.error(other);
             return false;
         }
@@ -289,7 +289,7 @@ module es {
                 return false;
             }
 
-            console.error(`overlaps of Pologon to ${other} are not supported`);
+            console.error(`overlaps of Pologon to ${other.constructor.name} are not supported`);
             console.error(other);
             return false;
         }
