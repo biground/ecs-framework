@@ -126,12 +126,9 @@ module es {
             for (let x = p1.x; x <= p2.x; x++) {
                 for (let y = p1.y; y <= p2.y; y++) {
                     const cell = this.cellAtPosition(x, y);
-                    if (!cell) {
-                        continue;
-                    }
 
                     // 如果单元格不为空，循环并取回所有碰撞器
-                    if (cell.length > 0) {
+                    if (cell?.length > 0) {
                         for (let i = 0; i < cell.length; i++) {
                             const collider = cell[i];
 
@@ -350,7 +347,7 @@ module es {
             let cell: Collider[] = this._cellDict.tryGetValue(x, y);
 
             // 如果不存在此位置的单元格，并且需要创建，则创建并返回空单元格
-            if (!cell) {
+            if (typeof cell == "undefined") {
                 if (createCellIfEmpty) {
                     cell = [];
                     this._cellDict.add(x, y, cell);
@@ -366,7 +363,7 @@ module es {
      */
     export class NumberDictionary<T> {
         // 存储数据的 Map 对象
-        public _store: Map<number, T[]> = new Map<number, T[]>();
+        public _store: Map<string, T[]> = new Map<string, T[]>();
 
         /**
          * 将指定的列表添加到以给定 x 和 y 为键的字典条目中
@@ -407,7 +404,7 @@ module es {
          * @returns 唯一的字符串键
          */
         public getKey(x: number, y: number) {
-            return x * 100000 + y;
+            return `${x}_${y}`
         }
 
         /**
