@@ -3,7 +3,8 @@ module es {
 
     export class List<T> {
         protected _elements: T[];
-
+        /** 列表长度变化时调用 */
+        onChange = () => {}
         /**
          * 默认为列表的元素
          */
@@ -16,6 +17,7 @@ module es {
          */
         public add(element: T): void {
             this._elements.push(element)
+            this.onChange();
         }
 
         /**
@@ -30,6 +32,7 @@ module es {
          */
         public prepend(element: T): void {
             this._elements.unshift(element)
+            this.onChange();
         }
 
         /**
@@ -37,6 +40,7 @@ module es {
          */
         public addRange(elements: T[]): void {
             this._elements.push(...elements)
+            this.onChange();
         }
 
         /**
@@ -108,6 +112,7 @@ module es {
          */
         public clear(): void {
             this._elements.length = 0
+            this.onChange();
         }
 
         /**

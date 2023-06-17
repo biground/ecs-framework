@@ -74,6 +74,8 @@ module es {
             this.checkCreate(type);
             const objectQueue = this._objectQueue.get(type);
 
+            if (objectQueue.find(o => obj === o)) return;
+
             // 将对象推回缓存
             objectQueue.push(obj);
 
