@@ -63,36 +63,34 @@ module es {
             this.scene.entityProcessors.setDirty();
         }
 
-        public initialize() {
-
-        }
+        public initialize() {}
 
         public onChanged(entity: Entity) {
-            let contains = !!this._entities.find(e => e.id == entity.id);
+            let contains = !!this._entities.find((e) => e.id == entity.id);
             let interest = this._matcher.isInterestedEntity(entity);
-
-            if (interest && !contains)
-                this.add(entity);
-            else if (!interest && contains)
+            const enabled = entity.enabled;
+            if (!enabled) {
                 this.remove(entity);
+            } else {
+                if (interest && !contains) this.add(entity);
+                else if (!interest && contains) this.remove(entity);
+            }
         }
 
         public add(entity: Entity) {
-            if (!this._entities.find(e => e.id == entity.id))
+            if (!this._entities.find((e) => e.id == entity.id))
                 this._entities.push(entity);
             this.onAdded(entity);
         }
 
-        public onAdded(entity: Entity) {
-        }
+        public onAdded(entity: Entity) {}
 
         public remove(entity: Entity) {
             new es.List(this._entities).remove(entity);
             this.onRemoved(entity);
         }
 
-        public onRemoved(entity: Entity) {
-        }
+        public onRemoved(entity: Entity) {}
 
         public update() {
             if (this.checkProcessing()) {
@@ -113,24 +111,20 @@ module es {
          * 在下一个系统开始处理或新的处理回合开始之前（以先到者为准），使用此方法创建的任何实体都不会激活
          */
         protected begin() {
-            if (!Core.Instance.debug)
-                return;
+            if (!Core.Instance.debug) return;
 
             this._startTime = Date.now();
         }
 
-        protected process(entities: Entity[]) {
-        }
+        protected process(entities: Entity[]) {}
 
-        protected lateProcess(entities: Entity[]) {
-        }
+        protected lateProcess(entities: Entity[]) {}
 
         /**
          * 系统处理完毕后调用
          */
         protected end() {
-            if (!Core.Instance.debug)
-                return;
+            if (!Core.Instance.debug) return;
 
             this._endTime = Date.now();
             this._useTime = this._endTime - this._startTime;

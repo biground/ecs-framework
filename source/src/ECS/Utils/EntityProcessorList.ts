@@ -46,6 +46,10 @@ module es {
             this.notifyEntityChanged(entity);
         }
 
+        public onEnabledChanged(entity: Entity): void {
+            this.notifyEntityChanged(entity);
+        }
+
         /**
          * 在场景中添加实体时被调用
          * @param entity 添加的实体

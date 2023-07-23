@@ -9,9 +9,9 @@ const tsProject = ts.createProject('tsconfig.json');
 
 function copy() {
     return merge([
-        gulp.src('bin/framework.min.js').pipe(gulp.dest('../../SnakeSurvivor/bin/libs/min/')),
-        gulp.src('bin/framework.js').pipe(gulp.dest('../../SnakeSurvivor/bin/libs/')),
-        gulp.src('bin/*.ts').pipe(gulp.dest('../../SnakeSurvivor/libs/')),
+        gulp.src('bin/framework.min.js').pipe(gulp.dest('../../snake-survivor/bin/libs_pkg/libs/min/')),
+        gulp.src('bin/framework.js').pipe(gulp.dest('../../snake-survivor/bin/libs_pkg/libs/min')),
+        gulp.src('bin/*.ts').pipe(gulp.dest('../../snake-survivor/libs/')).pipe(gulp.dest('../../snake-survivor/sub-proj/libs/')),
     ]);
 }
 

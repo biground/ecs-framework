@@ -18,11 +18,11 @@
   },
   "include": [
     "src",
+    "src/Debug/**/*",
     "libs"
   ],
   "exclude": [
     "node_modules",
-    "src/Debug/*",
     "src/Utils/Analysis/*",
     "src/Utils/DynamicAtlas/*",
     "src/ECS/Components/Physics/ArcadeRigidbody.ts",

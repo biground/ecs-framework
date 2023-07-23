@@ -417,13 +417,17 @@ module es {
 
         public onEntityEnabled() {
             if (this._components.length > 0) {
-                for (let i = 0, s = this._components.length; i < s; i++) this._components[i].onEnabled();
+                for (let i = 0, s = this._components.length; i < s; i++) {
+                    this._components[i].enabled = true;
+                }
             }
         }
 
         public onEntityDisabled() {
             if (this._components.length > 0) {
-                for (let i = 0, s = this._components.length; i < s; i++) this._components[i].onDisabled();
+                for (let i = 0, s = this._components.length; i < s; i++) {
+                    this._components[i].enabled = false;
+                }
             }
         }
     }

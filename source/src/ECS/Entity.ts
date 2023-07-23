@@ -332,6 +332,9 @@ module es {
 
                 if (this._enabled) this.components.onEntityEnabled();
                 else this.components.onEntityDisabled();
+                if (this.scene) {
+                    this.scene.entityProcessors.onEnabledChanged(this);
+                }
             }
 
             return this;
@@ -419,7 +422,7 @@ module es {
          * @param componentType
          */
         public createComponent<T extends Component>(
-            componentType: new (...args) => T,
+            componentType: new (...args) => T
         ): T {
             let component = new componentType();
             this.addComponent(component);
@@ -451,7 +454,7 @@ module es {
          * @returns
          */
         public getComponentInScene<T extends Component>(
-            type: new (...args) => T,
+            type: new (...args) => T
         ): T {
             return this.components.getComponent(type, true);
         }
@@ -464,7 +467,7 @@ module es {
          */
         public tryGetComponent<T extends Component>(
             type: new (...args) => T,
-            outComponent: Ref<T>,
+            outComponent: Ref<T>
         ): boolean {
             outComponent.value = this.components.getComponent<T>(type, false);
             return outComponent.value != null;
@@ -483,7 +486,7 @@ module es {
          * @param type
          */
         public getOrCreateComponent<T extends Component>(
-            type: new (...args) => T,
+            type: new (...args) => T
         ) {
             let comp = this.components.getComponent<T>(type, false);
             if (!comp) {
@@ -500,7 +503,7 @@ module es {
          */
         public getComponents<T extends Component>(
             typeName: new (...args: any[]) => T,
-            componentList?: T[],
+            componentList?: T[]
         ): T[] {
             return this.components.getComponents(typeName, componentList);
         }
@@ -538,12 +541,12 @@ module es {
 
         public tweenPositionTo(
             to: Vector2,
-            duration: number = 0.3,
+            duration: number = 0.3
         ): ITween<Vector2> {
             const tween = Pool.obtain(TransformVector2Tween);
             tween.setTargetAndType(
                 this.transform,
-                TransformTargetType.position,
+                TransformTargetType.position
             );
             tween.initialize(tween, to, duration);
 
@@ -552,12 +555,12 @@ module es {
 
         public tweenLocalPositionTo(
             to: Vector2,
-            duration = 0.3,
+            duration = 0.3
         ): ITween<Vector2> {
             const tween = Pool.obtain(TransformVector2Tween);
             tween.setTargetAndType(
                 this.transform,
-                TransformTargetType.localPosition,
+                TransformTargetType.localPosition
             );
             tween.initialize(tween, to, duration);
 
@@ -567,7 +570,7 @@ module es {
         public tweenScaleTo(to: Vector2, duration?: number);
         public tweenScaleTo(to: number, duration?: number);
         public tweenScaleTo(to: Vector2 | number, duration: number = 0.3) {
-            if (typeof to == 'number') {
+            if (typeof to == "number") {
                 return this.tweenScaleTo(new Vector2(to, to), duration);
             }
 
@@ -581,14 +584,14 @@ module es {
         public tweenLocalScaleTo(to: Vector2, duration?);
         public tweenLocalScaleTo(to: number, duration?);
         public tweenLocalScaleTo(to: Vector2 | number, duration = 0.3) {
-            if (typeof to == 'number') {
+            if (typeof to == "number") {
                 return this.tweenLocalScaleTo(new Vector2(to, to), duration);
             }
 
             const tween = Pool.obtain(TransformVector2Tween);
             tween.setTargetAndType(
                 this.transform,
-                TransformTargetType.localScale,
+                TransformTargetType.localScale
             );
             tween.initialize(tween, to, duration);
 
@@ -599,7 +602,7 @@ module es {
             const tween = Pool.obtain(TransformVector2Tween);
             tween.setTargetAndType(
                 this.transform,
-                TransformTargetType.rotationDegrees,
+                TransformTargetType.rotationDegrees
             );
             tween.initialize(tween, new Vector2(to, to), duration);
 
@@ -610,7 +613,7 @@ module es {
             const tween = Pool.obtain(TransformVector2Tween);
             tween.setTargetAndType(
                 this.transform,
-                TransformTargetType.localRotationDegrees,
+                TransformTargetType.localRotationDegrees
             );
             tween.initialize(tween, new Vector2(to, to), duration);
 
