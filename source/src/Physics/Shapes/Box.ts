@@ -12,6 +12,11 @@ module es {
             this.width = width;
             this.height = height;
         }
+        setTo(width: number, height: number) {
+            super.setPoints(Box.buildBox(width, height));
+            this.width = width;
+            this.height = height;
+        }
 
         /**
          * 在一个盒子的形状中建立多边形需要的点的帮助方法
@@ -49,8 +54,7 @@ module es {
             this.points[2] = new Vector2(halfWidth, halfHeight);
             this.points[3] = new Vector2(-halfWidth, halfHeight);
 
-            for (let i = 0; i < this.points.length; i++)
-                this._originalPoints[i] = this.points[i];
+            for (let i = 0; i < this.points.length; i++) this._originalPoints[i] = this.points[i];
         }
 
         public getEdges(): Array<Line> {
@@ -67,11 +71,9 @@ module es {
         public overlaps(other: Shape) {
             // 特殊情况，这一个高性能方式实现，其他情况则使用polygon方法检测
             if (this.isUnrotated) {
-                if (other instanceof Box && other.isUnrotated)
-                    return this.bounds.intersects(other.bounds);
+                if (other instanceof Box && other.isUnrotated) return this.bounds.intersects(other.bounds);
 
-                if (other instanceof Circle)
-                    return Collisions.rectToCircle(this.bounds, other.position, other.radius);
+                if (other instanceof Circle) return Collisions.rectToCircle(this.bounds, other.position, other.radius);
             }
 
             return super.overlaps(other);
@@ -89,15 +91,13 @@ module es {
         }
 
         public containsPoint(point: Vector2) {
-            if (this.isUnrotated)
-                return this.bounds.contains(point.x, point.y);
+            if (this.isUnrotated) return this.bounds.contains(point.x, point.y);
 
             return super.containsPoint(point);
         }
 
         public pointCollidesWithShape(point: Vector2, result: Out<CollisionResult>): boolean {
-            if (this.isUnrotated)
-                return ShapeCollisionsPoint.pointToBox(point, this, result);
+            if (this.isUnrotated) return ShapeCollisionsPoint.pointToBox(point, this, result);
 
             return super.pointCollidesWithShape(point, result);
         }

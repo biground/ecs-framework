@@ -141,8 +141,7 @@ module es {
          * @param collider
          */
         public static updateCollider(collider: Collider) {
-            this._spatialHash.remove(collider);
-            this._spatialHash.register(collider);
+            this._spatialHash.update(collider);
         }
 
         /**
@@ -150,7 +149,7 @@ module es {
          * @param start
          * @param end
          * @param layerMask
-         */
+         */ 
         public static linecast(start: Vector2, end: Vector2, layerMask: number = this.allLayers, ignoredColliders: Set<Collider> = null): RaycastHit {
             this._hitArray[0].reset();
             Physics.linecastAll(

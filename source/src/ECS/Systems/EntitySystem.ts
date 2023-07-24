@@ -68,18 +68,17 @@ module es {
         public onChanged(entity: Entity) {
             let contains = !!this._entities.find((e) => e.id == entity.id);
             let interest = this._matcher.isInterestedEntity(entity);
-            const enabled = entity.enabled;
+            let enabled = entity.enabled;
             if (!enabled) {
                 this.remove(entity);
-            } else {
-                if (interest && !contains) this.add(entity);
-                else if (!interest && contains) this.remove(entity);
+                return;
             }
+            if (interest && !contains) this.add(entity);
+            else if (!interest && contains) this.remove(entity);
         }
 
         public add(entity: Entity) {
-            if (!this._entities.find((e) => e.id == entity.id))
-                this._entities.push(entity);
+            if (!this._entities.find(e => e.id == entity.id)) this._entities.push(entity);
             this.onAdded(entity);
         }
 

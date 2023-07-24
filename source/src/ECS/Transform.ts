@@ -261,13 +261,11 @@ module es {
          * @param parent
          */
         public setParent(parent: Transform): Transform {
-            if (this._parent == parent)
-                return this;
+            if (this._parent == parent) return this;
 
             if (this._parent != null) {
                 const index = this._parent._children.findIndex(t => t == this);
-                if (index != -1)
-                    this._parent._children.splice(index, 1);
+                if (index != -1) this._parent._children.splice(index, 1);
             }
 
             if (parent != null) {
@@ -287,8 +285,7 @@ module es {
          */
         public setPosition(x: number, y: number): Transform {
             let position = new Vector2(x, y);
-            if (position.equals(this._position))
-                return this;
+            if (position.equals(this._position)) return this;
 
             this._position = position;
             if (this.parent != null) {
@@ -306,16 +303,14 @@ module es {
          * @param localPosition
          */
         public setLocalPosition(localPosition: Vector2): Transform {
-            if (localPosition.equals(this._localPosition))
-                return this;
+            if (localPosition.equals(this._localPosition)) return this;
 
             this._localPosition = localPosition;
-            this._localDirty = this._positionDirty = this._localPositionDirty = this._localRotationDirty = this._localScaleDirty = true;
+            this._localDirty = this._positionDirty = this._localPositionDirty = true;
             this.setDirty(DirtyType.positionDirty);
 
             return this;
         }
-
 
         /**
          * 设置变换在世界空间的旋转度
@@ -407,8 +402,7 @@ module es {
 
         public updateTransform() {
             if (this.hierarchyDirty != DirtyType.clean) {
-                if (this.parent != null)
-                    this.parent.updateTransform();
+                if (this.parent != null) this.parent.updateTransform();
 
                 if (this._localDirty) {
                     if (this._localPositionDirty) {
@@ -442,7 +436,7 @@ module es {
                 if (this.parent != null) {
                     Matrix2D.multiply(this._localTransform, this.parent._worldTransform, this._worldTransform);
                     this._rotation = this._localRotation + this.parent._rotation;
-                    this._scale = this.parent._scale.multiply(this._localScale);;
+                    this._scale = this.parent._scale.multiply(this._localScale);
                     this._worldInverseDirty = true;
                 }
 
@@ -469,8 +463,9 @@ module es {
                 }
 
                 // 告诉子项发生了变换
-                for (let i = 0; i < this._children.length; i++)
+                for (let i = 0; i < this._children.length; i++) {
                     this._children[i].setDirty(dirtyFlagType);
+                }
             }
         }
 

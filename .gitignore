@@ -9,3 +9,4 @@
 /demo/.vscode
 /source/docs
 source/bin
+node_modules

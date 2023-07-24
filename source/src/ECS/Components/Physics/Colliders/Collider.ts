@@ -3,6 +3,10 @@ module es {
         public static readonly lateSortOrder = 999;
         public drawCollider: Function;
         public castSortOrder: number = 0;
+        /** bounds的左上角坐标 */
+        public tp: es.Vector2 = es.Vector2.zero;
+        /** bounds的右下角坐标 */
+        public rd: es.Vector2 = es.Vector2.zero;
         /**
          * 对撞机的基本形状
          */

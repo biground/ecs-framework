@@ -7,7 +7,7 @@
     "module": "system",
     "target": "es6",
     "declaration": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "removeComments": false,
     "outFile": "./framework.js",
     "skipLibCheck": true,
@@ -25,10 +25,9 @@
     "node_modules",
     "src/Utils/Analysis/*",
     "src/Utils/DynamicAtlas/*",
-    "src/ECS/Components/Physics/ArcadeRigidbody.ts",
     "src/ECS/Components/Physics/CharacterController.ts",
-    "src/ECS/Components/Physics/Mover.ts",
     "src/ECS/Components/Physics/ProjectileMover.ts",
+    "src/ECS/Components/Physics/Mover.ts",
     "src/Physics/ColliderTriggerHelper.ts",
   ]
 }

@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "gulp-sourcemaps": "^3.0.0"
+  }
+}

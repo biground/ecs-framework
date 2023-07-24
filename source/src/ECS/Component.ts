@@ -76,12 +76,6 @@ module es {
         public onRemovedFromEntity() {
         }
 
-        /**
-         * 当实体的位置改变时调用。这允许组件知道它们由于父实体的移动而移动了。
-         * @param comp
-         */
-        public onEntityTransformChanged(comp: ComponentTransform) {
-        }
 
         /**
          *当父实体或此组件启用时调用

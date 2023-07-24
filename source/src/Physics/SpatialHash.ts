@@ -105,67 +105,55 @@ module es {
             const p2 = this.cellCoords(bounds.right, bounds.bottom);
 
             // 检查是否需要更新
-            if (collider.oldP1 && collider.oldP2 && collider.oldP1.equals(p1) && collider.oldP2.equals(p2)) {
+            if (collider.tp && collider.rd && collider.tp.equals(p1) && collider.rd.equals(p2)) {
                 // 不需要更新，直接返回
                 return;
             }
 
             // 使用 Set 数据结构来保存需要更新的单元格坐标
-            const updatedCellCoords = new Set<Vector2>();
+            const updatedCellCoords = {}
 
             // 将碰撞器添加到所在的所有单元格中
             for (let x = p1.x; x <= p2.x; x++) {
+                updatedCellCoords[x] = {}
                 for (let y = p1.y; y <= p2.y; y++) {
-                    const cellCoords = this.tempCellCoordsPool.pop() || new Vector2();
-                    cellCoords.set(x, y);
-
                     // 添加单元格坐标到 Set 中，表示需要更新该单元格
-                    updatedCellCoords.add(cellCoords);
-
-                    // 回收临时的单元格坐标对象
-                    this.tempCellCoordsPool.push(cellCoords);
+                    updatedCellCoords[x][y] = true;
+                    const cell: Collider[] = this.cellAtPosition(x, y, /* createIfNotExists = */ true);
+                    cell.push(collider);
                 }
             }
 
             // 移除旧的碰撞器引用
-            if (collider.oldP1 && collider.oldP2) {
-                for (let x = collider.oldP1.x; x <= collider.oldP2.x; x++) {
-                    for (let y = collider.oldP1.y; y <= collider.oldP2.y; y++) {
-                        const oldCellCoords = this.tempCellCoordsPool.pop() || new Vector2();
-                        oldCellCoords.set(x, y);
+            for (let x = collider.tp.x; x <= collider.rd.x; x++) {
+                for (let y = collider.tp.y; y <= collider.rd.y; y++) {
 
-                        if (!updatedCellCoords.has(oldCellCoords)) {
-                            const cell = this.cellAtPosition(x, y);
-                            if (cell != null) {
-                                const index = cell.indexOf(collider);
-                                if (index !== -1) {
-                                    // 将要删除的元素和数组末尾的元素交换，并使用 pop 方法删除末尾元素
-                                    const lastIndex = cell.length - 1;
-                                    if (index !== lastIndex) {
-                                        const temp = cell[lastIndex];
-                                        cell[lastIndex] = cell[index];
-                                        cell[index] = temp;
-                                    }
-                                    cell.pop();
+                    if (!updatedCellCoords[x]?.[y]) {
+                        const cell = this.cellAtPosition(x, y);
+                        if (cell != null) {
+                            const index = cell.indexOf(collider);
+                            if (index != -1) {
+                                // 将要删除的元素和数组末尾的元素交换，并使用 pop 方法删除末尾元素
+                                const lastIndex = cell.length - 1;
+                                if (index != lastIndex) {
+                                    const temp = cell[lastIndex];
+                                    cell[lastIndex] = cell[index];
+                                    cell[index] = temp;
                                 }
+                                cell.pop();
                             }
                         }
-
-                        // 回收临时的单元格坐标对象
-                        this.tempCellCoordsPool.push(oldCellCoords);
                     }
                 }
             }
 
             // 更新碰撞器的已注册单元格坐标和旧的 p1 和 p2
-            collider.registeredCellCoords = updatedCellCoords;
-            collider.oldP1 = p1.clone();
-            collider.oldP2 = p2.clone();
+            collider.tp = p1.clone();
+            collider.rd = p2.clone();
 
             // 更新网格边界，以确保其覆盖所有碰撞器
-            this.gridBounds.set(p1.x, p1.y, p2.x, p2.y);
+            this.gridBounds.setTo(p1.x, p1.y, p2.x, p2.y);
         }
-
 
         /**
          * 使用蛮力方法从SpatialHash中删除对象
@@ -402,7 +390,7 @@ module es {
          */
         public cellCoords(x: number, y: number): Vector2 {
             // 使用 inverseCellSize 计算出单元格的 x 和 y 坐标
-            return new Vector2(x * this._inverseCellSize | 0, y * this._inverseCellSize | 0);   
+            return new Vector2((x * this._inverseCellSize) | 0, (y * this._inverseCellSize) | 0);
         }
 
         /**
@@ -418,7 +406,7 @@ module es {
             let cell: Collider[] = this._cellDict.tryGetValue(x, y);
 
             // 如果不存在此位置的单元格，并且需要创建，则创建并返回空单元格
-            if (typeof cell == "undefined") {
+            if (typeof cell == 'undefined') {
                 if (createCellIfEmpty) {
                     cell = [];
                     this._cellDict.add(x, y, cell);
@@ -475,7 +463,7 @@ module es {
          * @returns 唯一的字符串键
          */
         public getKey(x: number, y: number) {
-            return `${x}_${y}`
+            return `${x}_${y}`;
         }
 
         /**

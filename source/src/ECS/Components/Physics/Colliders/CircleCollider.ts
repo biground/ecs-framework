@@ -12,6 +12,7 @@ module es {
             super();
 
             this.shape = new Circle(radius);
+            this.setShouldColliderScaleAndRotateWithTransform(false);
         }
 
         public get radius(): number {

@@ -16,7 +16,7 @@ module es {
          */
         public static warnIf(condition: boolean, format: string, ...args: any[]) {
             if (condition)
-                this.log(LogType.warn, format, args);
+                this.print(LogType.warn, format, args);
         }
 
         /**
@@ -25,7 +25,7 @@ module es {
          * @param args 与消息格式相对应的参数列表
          */
         public static warn(format: string, ...args: any[]) {
-            this.log(LogType.warn, format, args);
+            this.print(LogType.warn, format, args);
         }
 
         /**
@@ -34,7 +34,16 @@ module es {
          * @param args 与消息格式相对应的参数列表
          */
         public static error(format: string, ...args: any[]) {
-            this.log(LogType.error, format, args);
+            this.print(LogType.error, format, args);
+        }
+
+        /**
+         * 在控制台中以错误方式打印消息。
+         * @param format 要打印的消息格式
+         * @param args 与消息格式相对应的参数列表
+         */
+        public static log(format: string, ...args: any[]) {
+            this.print(LogType.log, format, args);
         }
 
         /**
@@ -43,7 +52,8 @@ module es {
          * @param format 要打印的消息格式
          * @param args 与消息格式相对应的参数列表
          */
-        public static log(type: LogType, format: string, ...args: any[]) {
+        public static print(type: LogType = LogType.log, format: string = "", ...args: any[]) {
+            if (!es.Core.Instance.debug) return;
             switch (type) {
                 case LogType.error:
                     console.error(`${type}: ${StringUtils.format(format, args)}`);

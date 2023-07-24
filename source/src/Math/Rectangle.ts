@@ -118,6 +118,9 @@ module es {
          * @param height 创建的矩形的高度
          */
         constructor(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
+            this.setTo(x, y, width, height)
+        }
+        setTo(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
             this.x = x;
             this.y = y;
             this.width = width;

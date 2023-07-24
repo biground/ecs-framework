@@ -217,18 +217,22 @@ module es {
         }
 
         public recalculateBounds(collider: Collider) {
+            // 多边形中心
             this.center = collider.localOffset;
 
             if (collider.shouldColliderScaleAndRotateWithTransform) {
+                // 随着实体旋转
                 let hasUnitScale = true;
                 const tempMat = new Matrix2D();
                 const combinedMatrix = new Matrix2D();
 
+                // 平移逆矩阵
                 Matrix2D.createTranslation(-this._polygonCenter.x, -this._polygonCenter.y, combinedMatrix);
 
                 const scale = collider.entity.transform.scale;
                 if (!scale.equals(Vector2.one)) {
                     Matrix2D.createScale(scale.x, scale.y, tempMat);
+                    // 缩放矩阵
                     Matrix2D.multiply(combinedMatrix, tempMat, combinedMatrix);
                     hasUnitScale = false;
 
@@ -236,6 +240,7 @@ module es {
                     this.center = scaledOffset;
                 }
 
+                // 旋转矩阵
                 const rotation = collider.entity.transform.rotationDegrees;
                 if (rotation !== 0) {
                     const offsetLength = hasUnitScale ? collider._localOffsetLength : collider.localOffset.multiply(scale).magnitude();

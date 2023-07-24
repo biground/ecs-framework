@@ -10,6 +10,8 @@ module es {
          * 实体的组件列表。
          */
         public _components: Component[] = [];
+        /** 需要更新transform的组件列表 */
+        public _needUpdateTransformComponents: INeedUpdateTransform[] = [];
 
         /**
          * 可更新的组件列表。
@@ -80,6 +82,9 @@ module es {
             // 将组件添加到_componentsToAdd和_componentsToAddList中，并添加到相应的组件类型字典中
             this._componentsToAdd[component.id] = component;
             this._componentsToAddList.push(component);
+            if (isNeedUpdateTransform(component)) {
+                this._needUpdateTransformComponents = Array.from(new Set(this._needUpdateTransformComponents).add(component));
+            }
             this.addComponentsToAddByType(component);
         }
 
@@ -96,6 +101,21 @@ module es {
                 }
                 delete this._componentsToAdd[component.id];
                 this.removeComponentsToAddByType(component);
+
+                // 如果组件可以更新，从可更新组件列表中删除该组件
+                if (isIUpdatable(component) && this._updatableComponents.length > 0) {
+                    const index = this._updatableComponents.findIndex(c => ((<any>c) as Component).id === component.id);
+                    if (index !== -1) {
+                        this._updatableComponents.splice(index, 1);
+                    }
+                }
+
+                if (isNeedUpdateTransform(component) && this._needUpdateTransformComponents.length > 0) {
+                    const index = this._needUpdateTransformComponents.findIndex(c => ((<any>c) as Component).id === component.id);
+                    if (index !== -1) {
+                        this._needUpdateTransformComponents.splice(index, 1);
+                    }
+                }
                 return;
             }
 
@@ -117,6 +137,7 @@ module es {
             this.componentsByType.clear();
             this.componentsToAddByType.clear();
             this._components.length = 0;
+            this._needUpdateTransformComponents.length = 0;
             this._updatableComponents.length = 0;
             this._componentsToAdd = {};
             this._componentsToRemove = {};
@@ -136,6 +157,10 @@ module es {
                         new es.List(this._updatableComponents).remove(component);
                     }
 
+                    if (isNeedUpdateTransform(component)) {
+                        new es.List(this._needUpdateTransformComponents).remove(component);
+                    }
+
                     // 从位掩码中减去组件类型的索引，通知实体处理器一个组件已被移除
                     this.decreaseBits(component);
                     this._entity.scene.entityProcessors.onComponentRemoved(this._entity);
@@ -152,6 +177,10 @@ module es {
                     if (isIUpdatable(component)) {
                         // 如果组件是可更新的，则将其添加到_updatableComponents中
                         this._updatableComponents.push(component);
+                    }
+
+                    if (isNeedUpdateTransform(component)) {
+                        this._needUpdateTransformComponents.push(component);
                     }
 
                     // 将组件类型的索引添加到实体的位掩码中，通知实体处理器一个组件已被添加
@@ -263,6 +292,13 @@ module es {
                 }
             }
 
+            if (isNeedUpdateTransform(component) && this._needUpdateTransformComponents.length > 0) {
+                const index = this._needUpdateTransformComponents.findIndex(c => ((<any>c) as Component).id === component.id);
+                if (index !== -1) {
+                    this._needUpdateTransformComponents.splice(index, 1);
+                }
+            }
+
             // 更新实体的组件位掩码
             this.decreaseBits(component);
 
@@ -279,7 +315,7 @@ module es {
             const fastList = this.componentsByType.get(TypeUtils.getType(component));
 
             if (!fastList) {
-                console.error(`尝试移除${this._entity.toString()}的${component?.constructor?.name}组件失败，组件已被移除`)
+                console.error(`尝试移除${this._entity.toString()}的${component?.constructor?.name}组件失败，组件已被移除`);
                 return;
             }
 
@@ -400,16 +436,8 @@ module es {
         }
 
         public onEntityTransformChanged(comp: ComponentTransform) {
-            if (this._components.length > 0) {
-                for (let i = 0, s = this._components.length; i < s; ++i) {
-                    let component = this._components[i];
-                    if (component.enabled) component.onEntityTransformChanged(comp);
-                }
-            }
-
-            if (this._componentsToAddList.length > 0) {
-                for (let i = 0, s = this._componentsToAddList.length; i < s; ++i) {
-                    let component = this._componentsToAddList[i];
+            if (this._needUpdateTransformComponents.length > 0) {
+                for (const component of this._needUpdateTransformComponents) {
                     if (component.enabled) component.onEntityTransformChanged(comp);
                 }
             }

@@ -99,7 +99,7 @@ module es {
             result.value = new CollisionResult();
 
             // 圆圈在多边形中的位置坐标
-            const poly2Circle = circle.position.sub(polygon.position);
+            const poly2Circle = circle.position?.sub(polygon.position);
 
             // 首先，我们需要找到从圆到多边形的最近距离
             const res = Polygon.getClosestPointOnPolygonToPoint(polygon._originalPoints, poly2Circle);

@@ -1,6 +1,7 @@
 ///<reference path="./Collider.ts" />
 module es {
     export class BoxCollider extends Collider {
+        public shape: Box;
         /**
          * 创建一个BoxCollider，并使用x/y组件作为局部Offset
          * @param x 
@@ -14,10 +15,17 @@ module es {
             this._localOffset = new Vector2(x + width / 2, y + height / 2);
             
             this.shape = new Box(width, height);
+
+            this.shouldColliderScaleAndRotateWithTransform = false;
+        }
+
+        setTo(x: number = 0, y: number = 0, width: number = 1, height: number = 1) {
+            this._localOffset = new Vector2(x + width / 2, y + height / 2);
+            this.shape.setTo(width, height);
         }
 
         public get width() {
-            return (this.shape as Box).width;
+            return this.shape.width;
         }
 
         public set width(value: number) {
@@ -25,7 +33,7 @@ module es {
         }
 
         public get height() {
-            return (this.shape as Box).height;
+            return this.shape.height;
         }
 
         public set height(value: number) {
