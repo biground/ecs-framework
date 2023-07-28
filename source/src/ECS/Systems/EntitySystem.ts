@@ -5,6 +5,7 @@ module es {
      */
     export abstract class EntitySystem {
         private _entities: Entity[] = [];
+        private _isEntityListUnsorted: boolean;
         get entities(): Entity[] {
             return this._entities;
         }
@@ -32,6 +33,7 @@ module es {
         constructor(matcher?: Matcher) {
             this._matcher = matcher ? matcher : Matcher.empty();
             this.initialize();
+            this.markEntityListUnsorted();
         }
 
         private _scene: Scene;
@@ -65,8 +67,11 @@ module es {
 
         public initialize() {}
 
+        public markEntityListUnsorted() {
+            this._isEntityListUnsorted = true;
+        }
         public onChanged(entity: Entity) {
-            let contains = !!this._entities.find((e) => e.id == entity.id);
+            let contains = !!this._entities.find(e => e.id == entity.id);
             let interest = this._matcher.isInterestedEntity(entity);
             let enabled = entity.enabled;
             if (!enabled) {
@@ -79,6 +84,7 @@ module es {
 
         public add(entity: Entity) {
             if (!this._entities.find(e => e.id == entity.id)) this._entities.push(entity);
+            this.markEntityListUnsorted();
             this.onAdded(entity);
         }
 
@@ -86,6 +92,7 @@ module es {
 
         public remove(entity: Entity) {
             new es.List(this._entities).remove(entity);
+            this.markEntityListUnsorted();
             this.onRemoved(entity);
         }
 
@@ -113,6 +120,11 @@ module es {
             if (!Core.Instance.debug) return;
 
             this._startTime = Date.now();
+
+            if (this._isEntityListUnsorted) {
+                this._entities.sort(Entity.entityComparer.compare);
+                this.markEntityListUnsorted();
+            }
         }
 
         protected process(entities: Entity[]) {}

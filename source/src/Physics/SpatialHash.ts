@@ -83,10 +83,14 @@ module es {
                     if (cell != null) {
                         // 调用 indexOf 方法，查找元素在列表中的索引值
                         const index = cell.indexOf(collider);
-                        // 如果元素存在，则调用 removeAt 方法将其从列表中删除，并返回 true，否则返回 false
-                        if (index !== -1) {
-                            cell.splice(index, 1);
+                        // 将要删除的元素和数组末尾的元素交换，并使用 pop 方法删除末尾元素
+                        const lastIndex = cell.length - 1;
+                        if (index != lastIndex) {
+                            const temp = cell[lastIndex];
+                            cell[lastIndex] = cell[index];
+                            cell[index] = temp;
                         }
+                        cell.pop();
                     }
                 }
             }
@@ -111,42 +115,42 @@ module es {
             }
 
             // 使用 Set 数据结构来保存需要更新的单元格坐标
-            const updatedCellCoords = {}
-
-            // 将碰撞器添加到所在的所有单元格中
-            for (let x = p1.x; x <= p2.x; x++) {
-                updatedCellCoords[x] = {}
-                for (let y = p1.y; y <= p2.y; y++) {
-                    // 添加单元格坐标到 Set 中，表示需要更新该单元格
-                    updatedCellCoords[x][y] = true;
-                    const cell: Collider[] = this.cellAtPosition(x, y, /* createIfNotExists = */ true);
-                    cell.push(collider);
-                }
-            }
+            const updatedCellCoords = {};
 
             // 移除旧的碰撞器引用
             for (let x = collider.tp.x; x <= collider.rd.x; x++) {
                 for (let y = collider.tp.y; y <= collider.rd.y; y++) {
-
-                    if (!updatedCellCoords[x]?.[y]) {
-                        const cell = this.cellAtPosition(x, y);
-                        if (cell != null) {
-                            const index = cell.indexOf(collider);
-                            if (index != -1) {
-                                // 将要删除的元素和数组末尾的元素交换，并使用 pop 方法删除末尾元素
-                                const lastIndex = cell.length - 1;
-                                if (index != lastIndex) {
-                                    const temp = cell[lastIndex];
-                                    cell[lastIndex] = cell[index];
-                                    cell[index] = temp;
-                                }
-                                cell.pop();
+                    const cell = this.cellAtPosition(x, y);
+                    if (cell != null) {
+                        const index = cell.indexOf(collider);
+                        if (index != -1) {
+                            // 将要删除的元素和数组末尾的元素交换，并使用 pop 方法删除末尾元素
+                            const lastIndex = cell.length - 1;
+                            if (index != lastIndex) {
+                                const temp = cell[lastIndex];
+                                cell[lastIndex] = cell[index];
+                                cell[index] = temp;
                             }
+                            cell.pop();
                         }
                     }
                 }
             }
-
+            // 将碰撞器添加到所在的所有单元格中
+            for (let x = p1.x; x <= p2.x; x++) {
+                updatedCellCoords[x] = {};
+                for (let y = p1.y; y <= p2.y; y++) {
+                    // 添加单元格坐标到 Set 中，表示需要更新该单元格
+                    updatedCellCoords[x][y] = true;
+                    const cell: Collider[] = this.cellAtPosition(x, y, /* createIfNotExists = */ true);
+                    if (cell != null) {
+                        const index = cell.indexOf(collider);
+                        if (index == -1) {
+                            cell.push(collider);
+                        }
+                    }
+                }
+            }
             // 更新碰撞器的已注册单元格坐标和旧的 p1 和 p2
             collider.tp = p1.clone();
             collider.rd = p2.clone();
@@ -197,7 +201,7 @@ module es {
                             }
 
                             // 检查碰撞器的 bounds 是否与边界矩形相交
-                            if (bounds.intersects(collider.bounds)) {
+                            if (!this._tempHashSet.has(collider) && bounds.intersects(collider.bounds)) {
                                 this._tempHashSet.add(collider);
                             }
                         }

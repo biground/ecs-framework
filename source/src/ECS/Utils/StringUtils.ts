@@ -234,9 +234,9 @@ module es {
         }
     
         public static format(str: string, ...args: any[]) {
-            for (let i = 0; i < args.length - 1; i++) {
+            for (let i = 0; i < args.length; i++) {
                 let reg = new RegExp("\\{" + i + "\\}", "gm");
-                str = str.replace(reg, args[i + 1]);
+                str = str.replace(reg, args[i]);
             }
     
             return str;

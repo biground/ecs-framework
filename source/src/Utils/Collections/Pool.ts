@@ -1,106 +1,105 @@
 module es {
-    export class Pool {
-        private static _objectQueue = new Map<new () => any, any[]>();
-
-        /**
-         * 预热缓存，使用最大的cacheCount对象填充缓存
-         * @param type 要预热的类型
-         * @param cacheCount 预热缓存数量
-         */
-        public static warmCache<T>(type: new (...args: any[]) => T, cacheCount: number) {
-            this.checkCreate(type);
-            const queue = this._objectQueue.get(type);
-            cacheCount -= queue.length;
-
-            // 如果需要预热更多的对象，则创建并添加到缓存
-            if (cacheCount > 0) {
-                for (let i = 0; i < cacheCount; i++) {
-                    queue.push(new type());
-                }
-            }
-        }
-
-        /**
-        * 将缓存修剪为cacheCount项目
-        * @param type 要修剪的类型
-        * @param cacheCount 修剪后的缓存数量
-        */
-        public static trimCache<T>(type: new (...args) => T, cacheCount: number) {
-            this.checkCreate(type);
-            const objectQueue = this._objectQueue.get(type);
-
-            // 如果需要修剪缓存，则弹出多余的对象
-            while (cacheCount < objectQueue.length) {
-                objectQueue.pop();
-            }
-        }
-
-        /**
-         * 清除缓存
-         * @param type 要清除缓存的类型
-         */
-        public static clearCache<T>(type: new (...args) => T) {
-            this.checkCreate(type);
-            const objectQueue = this._objectQueue.get(type);
-
-            // 清空缓存数组
-            objectQueue.length = 0;
-        }
-
-        /**
-         * 如果可以的话，从缓存中获取一个对象
-         * @param type 要获取的类型
-         */
-        public static obtain<T>(type: new (...args) => T): T {
-            this.checkCreate(type);
-            const objectQueue = this._objectQueue.get(type);
-
-            // 如果缓存中有对象，弹出一个并返回
-            if (objectQueue.length > 0) {
-                const obj = objectQueue.pop();
-                return obj;
-            }
-
-            // 如果没有缓存对象，则创建一个新的对象并返回
-            return new type() as T;
-        }
-
-        /**
-         * 将对象推回缓存
-         * @param type 对象的类型
-         * @param obj 要推回的对象
-         */
-        public static free<T>(type: new (...args) => T, obj: T) {
-            this.checkCreate(type);
-            const objectQueue = this._objectQueue.get(type);
-
-            if (objectQueue.find(o => obj === o)) return;
-
-            // 将对象推回缓存
-            objectQueue.push(obj);
-
-            // 如果对象实现了IPoolable接口，则调用reset方法重置对象
-            if (isIPoolable(obj)) {
-                obj.reset();
-            }
-        }
-
-        /**
-         * 检查缓存中是否已存在给定类型的对象池，如果不存在则创建一个
-         * @param type 要检查的类型
-         */
-        private static checkCreate<T>(type: new (...args: any[]) => T) {
-            if (!this._objectQueue.has(type)) {
-                this._objectQueue.set(type, []);
-            }
-        }
-    }
-
+    // 对象池中的对象需要实现的接口，包含可选的 reset 方法用于重置对象状态
     export interface IPoolable {
-        reset(): void;
+        reset?(): void;
     }
 
+    // 判断一个对象是否实现了 IPoolable 接口的辅助函数
     export const isIPoolable = (props: any): props is IPoolable => {
         return typeof props.reset === 'function';
     };
+
+    // 对象池类，用于创建和管理可复用对象
+    export class Pool {
+        private static _objectQueue = new Map<new (...args: any[]) => IPoolable, ObjectPool<IPoolable>>();
+
+        // 确保对象池存在于队列中
+        private static ensurePoolExists<T>(objectClass: new (...args: any[]) => T) {
+            if (!Pool._objectQueue.has(objectClass)) {
+                const pool = new ObjectPool<T>();
+                Pool._objectQueue.set(objectClass, pool);
+            }
+        }
+        
+        // 判断对象是否在对象池中
+        public static contains<T>(objectClass: new (...args: any[]) => T, obj: T) {
+            Pool.ensurePoolExists(objectClass);
+            const pool = Pool._objectQueue.get(objectClass) as ObjectPool<T>;
+            return pool.contains(obj);
+        }
+
+        // 返回对象池是否存在指定类的队列
+        public static hasPool<T>(objectClass: new (...args: any[]) => T) {
+            return Pool._objectQueue.has(objectClass);
+        }
+
+        // 预热对象池，将指定类的对象加入对象池缓存中
+        public static warmCache<T>(objectClass: new (...args: any[]) => T, count: number) {
+            Pool.ensurePoolExists(objectClass);
+            const pool = Pool._objectQueue.get(objectClass) as ObjectPool<T>;
+            for (let i = 0; i < count; i++) {
+                pool.warmUpCache(objectClass);
+            }
+        }
+
+        // 从对象池中获取指定类的对象，如果对象池为空，则创建新对象
+        public static obtain<T>(objectClass: new (...args: any[]) => T): T {
+            Pool.ensurePoolExists(objectClass);
+            const pool = Pool._objectQueue.get(objectClass) as ObjectPool<T>;
+            return pool.getObject(objectClass);
+        }
+
+        // 将对象释放回对象池，以备后续重用
+        public static free<T>(objectClass: new (...args: any[]) => T, obj: T) {
+            Pool.ensurePoolExists(objectClass);
+            const pool = Pool._objectQueue.get(objectClass) as ObjectPool<T>;
+            pool.releaseObject(obj);
+        }
+    }
+
+    // 对象池内部类，管理特定类的对象缓存
+    class ObjectPool<T extends IPoolable> {
+        private cacheSize: number;
+        private pool: Set<T> = new Set();
+
+        constructor(cacheSize: number = 10) {
+            this.cacheSize = cacheSize;
+        }
+
+        // 从对象池中获取对象，如果对象池为空，则创建新对象
+        getObject(objectClass: new (...args: any[]) => T): T {
+            if (this.pool.size > 0) {
+                const obj = this.pool.values().next().value as T; // 获取第一个对象
+                this.pool.delete(obj);
+                return obj;
+            } else {
+                return this.createNewObject(objectClass);
+            }
+        }
+
+        // 将对象释放回对象池，以备后续重用
+        releaseObject(obj: T) {
+            es.Debug.warnIf(this.pool.has(obj), '尝试释放一个已经在池中的对象');
+            if (isIPoolable(obj)) obj.reset(); // 重置对象状态
+            this.pool.add(obj);
+        }
+
+        // 创建新的对象并加入对象池缓存
+        private createNewObject(objectClass: new (...args: any[]) => T): T {
+            return new objectClass() as T;
+        }
+
+        // 预热对象池，将指定类的对象加入对象池缓存中
+        warmUpCache(objectClass: new (...args: any[]) => T) {
+            for (let i = 0; i < this.cacheSize; i++) {
+                const obj = this.createNewObject(objectClass);
+                this.pool.add(obj);
+            }
+        }
+
+        // 判断对象是否在对象池中
+        contains(obj: T) {
+            return this.pool.has(obj);
+        }
+    }
 }

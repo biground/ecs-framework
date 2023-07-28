@@ -264,8 +264,7 @@ module es {
             if (this._parent == parent) return this;
 
             if (this._parent != null) {
-                const index = this._parent._children.findIndex(t => t == this);
-                if (index != -1) this._parent._children.splice(index, 1);
+                new es.List(this._parent._children).remove(this);
             }
 
             if (parent != null) {
@@ -306,7 +305,7 @@ module es {
             if (localPosition.equals(this._localPosition)) return this;
 
             this._localPosition = localPosition;
-            this._localDirty = this._positionDirty = this._localPositionDirty = true;
+            this._localDirty = this._positionDirty = this._localPositionDirty = this._localRotationDirty = this._localScaleDirty = true;
             this.setDirty(DirtyType.positionDirty);
 
             return this;

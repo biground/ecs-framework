@@ -1,11 +1,31 @@
 module es {
-    export class Node<T>{
+    export interface INodeHasLifecycle {
+        onAddedToChain?(): any;
+        onRemovedFromChain?(): any;
+    }
+    export const isNodeHasLifecycle = (o: any): o is INodeHasLifecycle => {
+        return o.onAddedToChain !== undefined || o.onRemovedFromChain !== undefined;
+    };
+    export class Node<T> {
         element: T;
         next: Node<T>;
+        previous: Node<T>;
         // next为可选参数，如果不传则为undefined
         constructor(element: T, next?: Node<T>) {
             this.element = element;
             this.next = next;
+            this.previous = null;
+        }
+
+        onAddToChain() {
+            if (isNodeHasLifecycle(this.element)) {
+                this.element.onAddedToChain?.();
+            }
+        }
+        onRemoveFromChain() {
+            if (isNodeHasLifecycle(this.element)) {
+                this.element.onRemovedFromChain?.();
+            }
         }
     }
 
@@ -24,6 +44,7 @@ module es {
         protected next: any;
         protected equalsFn: equalsFnType<T>;
         protected head: Node<T>;
+        protected tail: Node<T>;
 
         constructor(equalsFn = defaultEquals) {
             // 初始化链表内部变量
@@ -31,10 +52,11 @@ module es {
             this.next = undefined;
             this.equalsFn = equalsFn;
             this.head = null;
+            this.tail = null;
         }
 
         // 链表尾部添加元素
-        push(element: T) {
+        push(element: T): Node<T> {
             // 声明结点变量，将元素当作参数传入生成结点
             const node = new Node(element);
             // 存储遍历到的链表元素
@@ -42,6 +64,7 @@ module es {
             if (this.head == null) {
                 // 链表为空，直接将链表头部赋值为结点变量
                 this.head = node;
+                this.tail = node;
             } else {
                 // 链表不为空，我们只能拿到链表中第一个元素的引用
                 current = this.head;
@@ -52,9 +75,13 @@ module es {
                 }
                 // 此时已经得到了链表的最后一个元素(null)，将链表的下一个元素赋值为结点变量。
                 current.next = node;
+                node.previous = current;
             }
+            node.onAddToChain();
+            this.tail = node;
             // 链表长度自增
             this.count++;
+            return node;
         }
 
         // 移除链表指定位置的元素
@@ -67,6 +94,9 @@ module es {
                 if (index === 0) {
                     this.head = current.next;
                 } else {
+                    if (index === this.count - 1) {
+                        this.tail = current.previous;
+                    }
                     // 获取目标参数上一个结点
                     const previous = this.getElementAt(index - 1);
                     // 当前结点指向目标结点
@@ -78,9 +108,11 @@ module es {
                      * previous.next指向current.next即删除目标结点的元素
                      */
                     previous.next = current.next;
+                    previous.next.previous = previous;
                 }
                 // 链表长度自减
                 this.count--;
+                current.onRemoveFromChain();
                 // 返回当前删除的目标结点
                 return current.element;
             }
@@ -104,7 +136,7 @@ module es {
             return undefined;
         }
 
-        // 向链表中插入元素
+        // 往链表中指定项之前插入元素
         insert(element: T, index: number) {
             // 参数有效性判断
             if (index >= 0 && index <= this.count) {
@@ -114,6 +146,7 @@ module es {
                 if (index === 0) {
                     // 将节点变量(node)的下一个元素指向链表的头部元素
                     node.next = this.head;
+                    this.head.previous = node;
                     // 链表头部元素赋值为节点变量
                     this.head = node;
                 } else {
@@ -121,18 +154,21 @@ module es {
                     const previous = this.getElementAt(index - 1);
                     // 将节点变量的下一个元素指向目标节点
                     node.next = previous.next;
+                    node.next.previous = node;
                     /**
                      * 此时node中当前结点为要插入的值
                      * next为原位置处的结点
                      * 因此将当前结点赋值为node，就完成了结点插入操作
                      */
                     previous.next = node;
+                    node.previous = previous;
                 }
+                node.onAddToChain();
                 // 链表长度自增
                 this.count++;
-                return true;
+                return node;
             }
-            return false;
+            return null;
         }
 
         // 根据元素获取其在链表中的索引
@@ -154,13 +190,19 @@ module es {
         }
 
         // 移除链表中的指定元素
-        remove(element: T) {
+        remove(element: T): T {
             // 获取element的索引,移除索引位置的元素
-            this.removeAt(this.indexOf(element));
+            return this.removeAt(this.indexOf(element));
         }
 
         clear() {
+            let current = this.head;
+            while (current != null) {
+                current.onRemoveFromChain();
+                current = current.next;
+            }
             this.head = undefined;
+            this.tail = undefined;
             this.count = 0;
         }
 
@@ -178,11 +220,15 @@ module es {
         getHead() {
             return this.head;
         }
+        // 获取链表尾部元素
+        getTail() {
+            return this.tail;
+        }
 
         // 获取链表中的所有元素
         toString() {
             if (this.head == null) {
-                return "";
+                return '';
             }
             let objString = `${this.head.element}`;
             // 获取链表顶点的下一个结点

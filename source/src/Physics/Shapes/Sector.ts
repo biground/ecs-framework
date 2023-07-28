@@ -56,7 +56,7 @@ module es {
             this.calculateProperties();
         }
         get radius() {
-            return this.m_radius
+            return this.m_radius;
         }
         set radius(r) {
             this.m_radius = r;
@@ -97,6 +97,7 @@ module es {
 
         public overlaps(other: Shape): boolean {
             let result = new Out<CollisionResult>();
+            if (other instanceof Box) return this.containsPoint(other.bounds.center);
             if (other instanceof Polygon) return ShapeCollisionSector.sectorToPolygon(this, other, result);
 
             if (other instanceof Circle) {
@@ -180,15 +181,16 @@ module es {
                 return false;
             }
 
-            const angle = toPoint.getAngle(); // 点到圆心的向量与 x 轴正方向的夹角
+            const angle = MathHelper.toDegrees(toPoint.getAngle()); // 点到圆心的向量与 x 轴正方向的夹角
             const startAngle = this.startAngle; // 圆弧起始角度
             const endAngle = startAngle + this.angleDegree; // 圆弧终止角度
 
             let angleDiff = angle - startAngle; // 计算点到圆弧起始角度的角度差
             if (angleDiff < 0) {
                 // 如果角度差小于 0，则说明点在圆弧角度的另一侧，需要加上 2 * PI
-                angleDiff += Math.PI * 2;
+                angleDiff += 360;
             }
+            angleDiff %= 360;
             if (angleDiff > this.angleDegree) {
                 // 如果角度差大于圆弧角度，则该点不在圆弧范围内
                 return false;

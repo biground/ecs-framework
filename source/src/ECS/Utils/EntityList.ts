@@ -5,6 +5,7 @@ module es {
          */
         public scene: Scene;
 
+        public _entityDict: { [index: number]: Entity } = {};
         /**
          * 实体列表
          */
@@ -38,7 +39,7 @@ module es {
         /**
          * 实体字典，以实体标签为键
          */
-        public _entityDict: Map<number, Set<Entity>> = new Map<number, Set<Entity>>();
+        public _entityTagDict: Map<number, Set<Entity>> = new Map<number, Set<Entity>>();
 
         /**
          * 未排序的标签集合
@@ -72,6 +73,7 @@ module es {
         public add(entity: Entity) {
             this._entitiesToAdded[entity.id] = entity;
             this._entitiesToAddedList.push(entity);
+            this.markEntityListUnsorted();
         }
 
         /**
@@ -94,6 +96,7 @@ module es {
             if (!this._entitiesToRemove[entity.id]) {
                 this._entitiesToRemove[entity.id] = entity;
             }
+            this.markEntityListUnsorted();
         }
 
         /** 移除尚未被添加的实体 */
@@ -124,7 +127,8 @@ module es {
 
             // 清空实体列表和实体字典
             this._entities.length = 0;
-            this._entityDict.clear();
+            this._entityDict = {};
+            this._entityTagDict.clear();
         }
 
         /**
@@ -134,7 +138,7 @@ module es {
          */
         public contains(entity: Entity): boolean {
             // 检查实体是否存在于_entitiesToAdded字典中
-            return !!this._entitiesToAdded[entity.id];
+            return !!this._entitiesToAdded[entity.id] || !!this._entityDict[entity.id];
         }
 
         /**
@@ -145,12 +149,12 @@ module es {
          */
         public getTagList(tag: number): Set<Entity> {
             // 尝试从_entityDict中获取具有指定标签的实体列表
-            let list = this._entityDict.get(tag);
+            let list = this._entityTagDict.get(tag);
 
             // 如果列表不存在，则创建一个新的Set实例，并添加到_entityDict中
             if (!list) {
                 list = new Set<Entity>();
-                this._entityDict.set(tag, list);
+                this._entityTagDict.set(tag, list);
             }
 
             return list;
@@ -164,12 +168,12 @@ module es {
          */
         public getBTagList(tag: number): Set<Entity> {
             // 尝试从_entityDict中获取具有指定标签的实体列表
-            let list = this._entityDict.get(tag);
+            let list = this._entityTagDict.get(tag);
 
             // 如果列表不存在，则创建一个新的Set实例，并添加到_entityDict中
             if (!list) {
                 list = new Set<Entity>();
-                this._entityDict.set(tag, list);
+                this._entityTagDict.set(tag, list);
             }
 
             return list;
@@ -196,7 +200,7 @@ module es {
          */
         public removeFromTagList(entity: Entity) {
             // 获取实体的标签列表
-            const list = this._entityDict.get(entity.tag);
+            const list = this._entityTagDict.get(entity.tag);
 
             // 如果标签列表存在，则从中移除实体
             if (list) {
@@ -228,7 +232,7 @@ module es {
         public removeFromBTagList(entity: Entity) {
             Flags.doActionInFlags(new Ref(entity.BTag), value => {
                 // 获取实体的标签列表
-                const list = this._entityDict.get(value);
+                const list = this._entityTagDict.get(value);
 
                 // 如果标签列表存在，则从中移除实体
                 if (list) {
@@ -264,6 +268,7 @@ module es {
                     const index = this._entities.findIndex(e => e.id === entity.id);
                     if (index !== -1) {
                         this._entities.splice(index, 1);
+                        delete this._entityDict[entity.id];
                     }
 
                     // 调用实体的onRemovedFromScene方法，并将其scene属性设置为null
@@ -284,6 +289,7 @@ module es {
                 // 添加实体到场景实体列表和标签列表中
                 for (const entity of this._entitiesToAddedList) {
                     this._entities.push(entity);
+                    this._entityDict[entity.id] = entity;
                     entity.scene = this.scene;
                     if (entity.BTag) {
                         this.addToBTagList(entity);
@@ -305,6 +311,10 @@ module es {
                 // 清空要添加的实体列表和字典
                 this._entitiesToAdded = {};
                 this._entitiesToAddedList.length = 0;
+            }
+            if (this._isEntityListUnsorted) {
+                this._entities.sort(Entity.entityComparer.compare);
+                this._isEntityListUnsorted = false;
             }
         }
 
@@ -357,7 +367,6 @@ module es {
          * @param name
          */
         public findEntityRight(name: string, isEnable: boolean = true) {
-
             if (this._entitiesToAddedList.length > 0) {
                 for (let i = this._entitiesToAddedList.length - 1, s = 0; i >= s; --i) {
                     let entity = this._entitiesToAddedList[i];
@@ -381,16 +390,7 @@ module es {
          */
         public findEntityById(id: number) {
             // 遍历场景中所有实体
-            if (this._entities.length > 0) {
-                for (let i = 0, s = this._entities.length; i < s; ++i) {
-                    let entity = this._entities[i];
-                    // 如果实体的ID匹配，返回该实体
-                    if (entity.id == id) return entity;
-                }
-            }
-
-            // 在未添加的实体列表中查找
-            return this._entitiesToAdded[id];
+            return this._entityDict[id] || this._entitiesToAdded[id];
         }
 
         /**

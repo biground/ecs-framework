@@ -152,9 +152,7 @@ module es {
          * @param to
          */
         public static angle(from: Vector2, to: Vector2): number {
-            from = from.normalize();
-            to = to.normalize();
-            return Math.acos(MathHelper.clamp(from.dot(to), -1, 1)) * MathHelper.Rad2Deg;
+            return Math.acos(from.dot(to) / (from.magnitude() * to.magnitude())) * MathHelper.Rad2Deg;
         }
 
         /**
